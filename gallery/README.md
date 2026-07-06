@@ -2,8 +2,8 @@
 
 ここに画像を置いて main に push すると、自動で以下に公開されます。
 
-- 一覧ページ: https://zenshin-inc.github.io/zenshin-contents/gallery/
-- 直リンク: `https://zenshin-inc.github.io/zenshin-contents/gallery/<フォルダ名>/<ファイル名>`
+- 一覧ページ: https://contents.zenshin-inc.co.jp/gallery/
+- 直リンク: `https://contents.zenshin-inc.co.jp/gallery/<フォルダ名>/<ファイル名>`
 
 ## 命名規則
 

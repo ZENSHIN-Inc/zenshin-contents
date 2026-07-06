@@ -2,7 +2,7 @@
 
 ZENSHIN のスライド・CG などを公開するコンテンツハブ（Marp + GitHub Pages）
 
-- **公開 URL**: https://zenshin-inc.github.io/zenshin-contents/
+- **公開 URL**: https://contents.zenshin-inc.co.jp/
 - main に push すると GitHub Actions が自動でビルドして公開します（完全 CLI 運用）
 
 ## ディレクトリ構成
