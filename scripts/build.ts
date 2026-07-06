@@ -239,7 +239,7 @@ fs.writeFileSync(
   path.join(DIST, "index.html"),
   pageHtml({
     title: SITE_TITLE,
-    nav: '<a href="./">スライド</a><a href="gallery/">ギャラリー</a>',
+    nav: '<a href="./">スライド</a><a href="gallery/">ギャラリー</a><a href="https://www.zenshin-inc.co.jp/blog/" target="_blank" rel="noopener">ブログ</a>',
     body: indexBody,
     rel: "",
   }),
@@ -259,7 +259,7 @@ fs.writeFileSync(
   path.join(DIST, "gallery", "index.html"),
   pageHtml({
     title: `ギャラリー | ${SITE_TITLE}`,
-    nav: '<a href="../">スライド</a><a href="./">ギャラリー</a>',
+    nav: '<a href="../">スライド</a><a href="./">ギャラリー</a><a href="https://www.zenshin-inc.co.jp/blog/" target="_blank" rel="noopener">ブログ</a>',
     body: galleryGroups.length > 0 ? gallerySections : '<p class="empty">画像はまだありません。</p>',
     rel: "../",
   }),
