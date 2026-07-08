@@ -2,7 +2,7 @@
 /* @size 4:3 960px 720px */
 /* @size 16:9 1280px 720px */
 /*
- * ZENSHIN ブランドテーマ v2.4
+ * ZENSHIN ブランドテーマ v2.6
  * - スライドサイズは 4:3（960x720）が既定。16:9 が必要な特殊ケースのみ frontmatter に `size: 16:9`
  * - 本文 22px / line-height 1.65（v2.3 で 25px から縮小。縮小で生まれた領域は文字数を増やす余地ではなく
  *   要素間の余白＝行間・箇条書き間・コールアウト前後に充てる設計）
@@ -10,11 +10,14 @@
  * - 背景は温かみのある紙色（gallery の手書き風挿絵のベージュと調和する）
  * - 見出しは 900 ウェイトで級差を大きく、アクセント色はゴールドのみに絞る
  *   （見出し下の短いゴールドバーは v2.1 で廃止 — 生成 AI 定番の装飾に見えるため）
+ * - 強調は 2 段階（v2.6）: **太字** = 太字のみ / ***太字*** = 太字 + ゴールド下線（核心フレーズ・1 ページ 1 カ所）
  * - 日本語フォント: Noto Sans JP（Web 表示は Google Fonts、PDF ビルドは CI にインストールした Noto CJK にフォールバック）
  *
  * レイアウト部品（Markdown 内に HTML で記述する。ビルドは --html 有効）:
  *   <!-- _class: center -->                      … 結論・メッセージ主体のページを中央揃えに
  *                                                   （箇条書き・コールアウトは左揃えを維持する）
+ *   <!-- _class: divider -->                     … 章扉（v2.5 で追加。濃紺背景の目次兼用ページ。
+ *                                                   全章の番号付きリストを置き、現在地の章だけ **太字** にする）
  *   <div class="columns"> A / B </div>          … 2 カラム（<div class="columns three"> で 3 カラム）
  *   <div class="card"> ### 見出し + 本文 </div>  … ゴールドトップボーダーのカード
  *   <div class="stats">
@@ -92,13 +95,21 @@ section a {
   color: var(--zenshin-blue);
 }
 
-/* 強調: 太字 + ゴールド下線（マーカーペンの下線風。ブランドの署名的表現）
-   ※ v2.4 で「alpha 付き linear-gradient による下半分ベタ塗りマーカー」を廃止 —
-     PDF ビューアによっては半透明グラデーションの描画が壊れてマゼンタに化けるため。
-     solid border の下線はどのビューアでも安全で、ベタ塗りより騒がしくならない */
+/* 強調は 2 段階（v2.6 で分離 — 全太字に下線が付くと騒がしく、強調の意味が薄まるため）:
+   - **太字**   = 太字のみ。ページ内に数カ所あってよい
+   - ***太字*** = 太字 + ゴールド下線（マーカーペンの下線風。ブランドの署名的表現）。
+                  「ここだけ読めばいい」核心フレーズ専用で 1 ページ 1 カ所まで
+   ※ 下線が solid border なのは v2.4 の経緯から（alpha 付き linear-gradient のベタ塗りマーカーは
+     PDF ビューアによって描画が壊れてマゼンタに化けるため廃止。solid border はどのビューアでも安全） */
 section strong {
   color: var(--zenshin-ink);
   font-weight: 700;
+}
+
+/* ***太字*** は <em><strong> として出力される。日本語の擬似斜体は可読性を落とすだけなので立体に戻す */
+section em > strong,
+section strong > em {
+  font-style: normal;
   border-bottom: 3px solid var(--zenshin-gold);
 }
 
@@ -359,7 +370,7 @@ section footer {
   letter-spacing: 0.08em;
 }
 
-/* 章ラベル: 章扉ページの代わりに、各章の現在地をページ左上に小さく示す。
+/* 章ラベル: 各章の現在地をページ左上に小さく示す（小規模デッキでは章扉の代わりになる）。
    デッキ側で章の先頭ページに <!-- header: N. 章名 --> を書く（まとめの直前で <!-- header: "" --> でクリア） */
 section header {
   position: absolute;
@@ -371,11 +382,12 @@ section header {
   letter-spacing: 0.1em;
 }
 
-section.lead header {
+section.lead header,
+section.divider header {
   display: none;
 }
 
-/* ---- 表紙・章扉（class: lead） ------------------------------------------ */
+/* ---- 表紙・謝辞（class: lead） ------------------------------------------ */
 
 section.lead {
   background: linear-gradient(135deg, #060a14 0%, var(--zenshin-ink) 55%, var(--zenshin-ink-soft) 100%);
@@ -423,6 +435,55 @@ section.lead blockquote {
 }
 
 section.lead footer,
-section.lead::after {
+section.lead::after,
+section.divider footer,
+section.divider::after {
   color: rgba(255, 255, 255, 0.55);
+}
+
+/* ---- 章扉（class: divider） --------------------------------------------- */
+
+/* 本文が多いデッキ（目安: 本文 12 枚以上）の章の区切りに使う目次兼用の扉。
+   lead と同じ濃紺背景で、紙色の本文ページの間に置くと区切りが一目でわかる。
+   書き方: 全章の番号付きリストを置き、現在地の章だけ **太字** にする（白字 + ゴールド下線で浮き上がる） */
+section.divider {
+  background: linear-gradient(135deg, #060a14 0%, var(--zenshin-ink) 55%, var(--zenshin-ink-soft) 100%);
+  color: #d7dde6;
+  text-align: center;
+  justify-content: center;
+}
+
+section.divider h1 {
+  color: #ffffff;
+  margin-bottom: 1.1em;
+}
+
+section.divider ol {
+  display: inline-block;
+  text-align: left;
+  font-size: 1.12em;
+}
+
+section.divider ol li {
+  color: rgba(215, 221, 230, 0.5);
+  margin-bottom: 0.7em;
+}
+
+section.divider ol li::marker {
+  color: rgba(215, 221, 230, 0.4);
+  font-weight: 700;
+}
+
+/* 現在地の章: 行ごと白く持ち上げ、番号をゴールドにする */
+section.divider ol li:has(strong) {
+  color: #ffffff;
+}
+
+section.divider ol li:has(strong)::marker {
+  color: var(--zenshin-gold);
+}
+
+section.divider strong {
+  color: #ffffff;
+  border-bottom: 3px solid var(--zenshin-gold);
 }
