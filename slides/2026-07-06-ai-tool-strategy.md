@@ -35,7 +35,7 @@ footer: © ZENSHIN Inc.
 
 - この 2 つを使い込めば、世の中のほとんどの AI ツールは**代替できる**
 - ツール連携・長時間実行・業務定型化は、この 2 社が先行している
-- **Grok 4.5** は性能・コスパで急浮上。ただし現時点では**観測対象**
+- **GPT-5.6 Sol** は Opus 4.8 を明確に上回り、Fable 5 に 1 点差。**2 強の構図は維持**
 
 このスライドでは「**なぜそう言い切れるのか**」を順に説明します。
 
@@ -59,11 +59,11 @@ footer: © ZENSHIN Inc.
 
 | ティア | モデル系列（代表モデル） |
 | --- | --- |
-| **T1 — 使い込み先** | **Claude 系**（Fable 5 / Opus 4.8 / Sonnet 5）・**GPT 系**（GPT-5.5） |
+| **T1 — 使い込み先** | **Claude 系**（Fable / Opus / Sonnet）・**GPT-5.6 系**（Sol / Terra / Luna） |
 | **T2 — 有力追走** | **Grok**（4.5）・**GLM**（5.2）・**Gemini**（3.5 Flash / 3.1 Pro） |
 | **T3 — コスパ勢** | **Qwen**・**DeepSeek**・**Kimi**・**MiniMax** など |
 
-出典: [Artificial Analysis](https://artificialanalysis.ai/)（2026年7月9日時点。代表モデルの位置づけ）
+出典: [Artificial Analysis](https://artificialanalysis.ai/)（2026年7月10日時点。代表モデルの位置づけ）
 
 - ***使い込み先は T1 の 2 系列***。ツール・課金・ノウハウの積み上げ先として強い
 - **T2 は無視できない追走**。Grok / GLM / Gemini が実務候補に入る
@@ -73,16 +73,16 @@ footer: © ZENSHIN Inc.
 
 <!-- _class: center -->
 
-# Grok 4.5 の位置づけ
+# GPT-5.6 Sol の位置づけ
 
 | 観点 | 評価 |
 | --- | --- |
-| **知能** | AA 指数 **54**。GPT-5.5（55）/ Opus 4.8（56）に迫る |
-| **コスト** | 1 タスク **$0.31**。フロンティア級ではかなり安い |
-| **速度** | **88 tokens/s**。GPT-5.5 や Fable 5 より速い |
-| **投資判断** | モデル単体は有力。ただし CLI・スキル・MCP の成熟は要観察 |
+| **知能** | AA 指数 **59**。Fable 5（60）に 1 点差、Opus 4.8（56）を上回る |
+| **コスト** | 1 タスク **$1.04**。Fable 5（$2.75）の約 3 分の 1 |
+| **速度** | **83 tokens/s**。Fable 5（63）より高速 |
+| **コーディング** | Codex で Coding Agent Index **80**。現行トップ |
 
-> Grok 4.5 は「T2 筆頭」の要注意モデル。ただし現時点の業務投資先は、***Claude Code / Codex を主軸にしつつ Grok を観測***が現実的。
+> Sol は Opus 4.8 を明確に上回った。一方、Fable 5 は総合知能と長時間の知識業務で首位を維持。***OpenAI / Anthropic の 2 強という判断は変わらない***。
 
 ---
 
@@ -90,10 +90,10 @@ footer: © ZENSHIN Inc.
 
 # 知能だけでなくコスパでも見る
 
-![w:600](../assets/slides/2026-07-06-ai-tool-strategy/aa-intelligence-vs-cost.png)
+![w:530](../assets/slides/2026-07-06-ai-tool-strategy/aa-intelligence-vs-cost.png)
 
-左上ほど優秀。**Grok 4.5 は低コストで T1 級に迫る**。
-業務ノウハウは ***Claude Code / Codex*** を軸に積む。
+左上ほど優秀。**GPT-5.6 Sol は Fable 5 に 1 点差で、コストは約 3 分の 1**。
+Opus 4.8 を上回り、GPT 系の優位が鮮明になった。
 
 ---
 
@@ -101,10 +101,10 @@ footer: © ZENSHIN Inc.
 
 # タイパ（速度）でも見る
 
-![w:560](../assets/slides/2026-07-06-ai-tool-strategy/aa-intelligence-vs-time.png)
+![w:530](../assets/slides/2026-07-06-ai-tool-strategy/aa-intelligence-vs-time.png)
 
-Claude 勢は遅い傾向で、***GPT-5.5 系・Gemini 系・Grok 4.5 が優位***。
-Grok 4.5 は **高スコア・高速・低コスト**を同時に満たす要注意モデル。
+**GPT-5.6 Sol は 83 tokens/s**。Fable 5（63）より速く、Opus 4.8 より高性能。
+速度まで含めると、Sol の優位はさらに大きい。
 
 ---
 
@@ -313,7 +313,7 @@ Claude と OpenAI は**ツール活用のリードカンパニー**。
 | コーディング多用のエンジニア | **$200** |
 
 - おすすめは **2 社とも $200**。様子見なら **$200 + $20 併用**から
-- 月 $200 ≒ **約 3 万円で GPT-5.5 / Opus 4.8 が使えるのは破格**
+- 月 $200 ≒ **約 3 万円で GPT-5.6 系 / Claude 最上位級が使えるのは破格**
 - ***重要なのは、サブスク定額で最上位級が使えること***（従量課金ではない）
 
 ---
