@@ -67,12 +67,6 @@ footer: © ZENSHIN Inc.
 
 # 迷ったらFireflies
 
-<div class="columns">
-
-<div>
-
-### 向いている
-
 - **主要Web会議へBot参加**
   - Zoom / Meet / Teams / Webex
 - **Botなしで取得**
@@ -82,26 +76,15 @@ footer: © ZENSHIN Inc.
 - **分析・再利用**
   - AskFred、AI Skills、Slack、CRM、API、MCP
 
-</div>
-
 <div class="callout warn" data-label="向かない場合">
 
-- 日本語と英語の二言語会議が最優先
-- 会議横断の検索と引用体験が最優先
-
-</div>
+日本語と英語の二言語会議が最優先ならNotta、会議横断の検索と引用体験が最優先ならFathomも比較する。
 
 </div>
 
 ---
 
 # Fathomを選ぶ場合
-
-<div class="columns">
-
-<div>
-
-### 向いている
 
 - **会議横断で質問・検索したい**
   - account全体を検索し、該当発言へ戻れる
@@ -112,27 +95,15 @@ footer: © ZENSHIN Inc.
 - **会議中も記録を補助したい**
   - live summary、scratchpad、clip
 
-</div>
-
 <div class="callout warn" data-label="確認事項">
 
-- Botなし録音、Slack Huddleは段階展開
-- iOS対面録音はベータ・OS差あり
-- 導入環境で利用可否を確認する
-
-</div>
+Botなし録音とSlack Huddleは段階展開。iOS対面録音にはベータ・OS差があるため、導入環境で利用可否を確認する。
 
 </div>
 
 ---
 
 # Nottaを選ぶ場合
-
-<div class="columns">
-
-<div>
-
-### 向いている
 
 - **日本語・多言語を重視**
   - 単一言語58言語に対応
@@ -143,15 +114,9 @@ footer: © ZENSHIN Inc.
 - **会議と文書を横断分析**
   - BrainでOffice文書も扱える
 
-</div>
-
 <div class="callout warn" data-label="確認事項">
 
-- Slack HuddleはBot・desktopに条件あり
-- Brainの有料枠は本体と独立
-- 公式MCPは確認できていない
-
-</div>
+Slack HuddleはBot・desktopに条件があり、Brainの有料枠は本体と独立する。公式MCPは確認できていない。
 
 </div>
 
@@ -238,56 +203,99 @@ footer: © ZENSHIN Inc.
 
 # 日本語利用で確認する点
 
-<div class="columns">
+<div class="cards">
 
-<div>
+<div class="card">
 
-- **固有名詞**
-  - 社名・製品名・人名で差が出る
-- **話者識別**
-  - 対面・重なり発話で崩れやすい
-- **最終決定**
-  - 途中の案を決定と誤認しやすい
+### 固有名詞
+
+社名・製品名・人名で差が出る
 
 </div>
 
-<div>
+<div class="card">
 
-- **action item**
-  - 担当者と期限まで取得できるか
-- **二言語**
-  - 対応言語数と実精度は別
+### 話者識別
+
+対面・重なり発話で崩れやすい
+
+</div>
+
+<div class="card">
+
+### 最終決定
+
+途中の案を決定と誤認しやすい
+
+</div>
+
+<div class="card">
+
+### action item
+
+担当者と期限まで取得できるか
+
+</div>
+
+<div class="card">
+
+### 二言語
+
+対応言語数と実精度は別
 
 </div>
 
 </div>
 
-- 公称対応言語数は精度順位ではない
-- 実際の日本語会議で文字起こし、要約、検索結果を確認する
+<div class="callout warn" data-label="検証方法">
+
+公称対応言語数を精度順位と見なさず、実際の日本語会議で文字起こし・要約・検索結果を確認する。
+
+</div>
 
 ---
 
 # 統制できる製品を選ぶ
 
-<div class="columns">
+<div class="cards">
 
-<div>
+<div class="card">
 
-- **ID・権限**
-  - SSO / SCIM / role / OAuth scope
-- **保持・削除**
-  - retention / export / 退職者対応
-- **監査**
-  - audit log / 共有履歴 / 管理者権限
+### ID・権限
+
+SSO / SCIM / role / OAuth scope
 
 </div>
 
-<div>
+<div class="card">
 
-- **データ**
-  - 保存地域 / 学習利用 / 暗号化
-- **同意**
-  - Bot・Botなし・対面の通知方法
+### 保持・削除
+
+retention / export / 退職者対応
+
+</div>
+
+<div class="card">
+
+### 監査
+
+audit log / 共有履歴 / 管理者権限
+
+</div>
+
+<div class="card">
+
+### データ
+
+保存地域 / 学習利用 / 暗号化
+
+</div>
+
+<div class="card">
+
+### 同意
+
+Bot・Botなし・対面の通知方法
 
 </div>
 
@@ -303,32 +311,55 @@ footer: © ZENSHIN Inc.
 
 # 価格は総費用で見る
 
-<div class="columns">
+<div class="cards">
 
-<div>
+<div class="card">
 
-- **課金単位**
-  - seat / minutes / AI credits
-- **契約期間**
-  - 月払い / 年払い / 最低seat
-- **追加費用**
-  - 翻訳 / Brain / API / storage
+### 課金単位
+
+seat / minutes / AI credits
 
 </div>
 
-<div>
+<div class="card">
 
-- **利用者区分**
-  - member / admin / viewer / guest
-- **実質費用**
-  - 対象人数 × 必要plan + 管理工数
+### 契約期間
+
+月払い / 年払い / 最低seat
+
+</div>
+
+<div class="card">
+
+### 追加費用
+
+翻訳 / Brain / API / storage
+
+</div>
+
+<div class="card">
+
+### 利用者区分
+
+member / admin / viewer / guest
+
+</div>
+
+<div class="card">
+
+### 実質費用
+
+対象人数 × 必要plan + 管理工数
 
 </div>
 
 </div>
 
-- 料金は2026年7月13日に再確認
-- 税・通貨・年払い条件が異なるため、表示価格の単純順位は付けない
+<div class="callout info" data-label="料金の見方">
+
+料金は2026年7月13日に再確認。税・通貨・年払い条件が異なるため、表示価格の単純順位は付けない。
+
+</div>
 
 ---
 
@@ -370,7 +401,11 @@ footer: © ZENSHIN Inc.
 - tl;dv: [Bot-free](https://intercom.help/tldv/en/articles/14433922-record-meetings-on-any-platform-with-or-without-a-bot-tl-dv-desktop-app) / [MCP](https://intercom.help/tldv/en/articles/15322415-mcp) / [Uploads](https://intercom.help/tldv/en/articles/7266251-uploads)
 - Notta: [Languages](https://support.notta.ai/hc/en-us/articles/4403155631131-What-languages-does-Notta-support) / [Brain](https://support.notta.ai/hc/en-us/articles/46061505657627-Introduction-to-Notta-Brain-Upgrade-Usage-Guide) / [Pricing](https://www.notta.ai/pricing)
 
-> 各社の公表機能を整理したもので、精度順位ではない。精度と運用適合性は実会議で確認する。
+<div class="callout info" data-label="資料の読み方">
+
+各社の公表機能を整理したもので、精度順位ではない。精度と運用適合性は実会議で確認する。
+
+</div>
 
 ---
 

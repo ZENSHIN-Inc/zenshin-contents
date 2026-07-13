@@ -23,7 +23,7 @@
  *   <div class="stats">
  *     <div class="stat"><div class="num">$200</div><div class="label">説明</div></div>
  *   </div>                                       … 大きな数字の KPI タイル（横に自動で並ぶ）
- *   blockquote（> 行）                           … 「POINT」ラベル付きコールアウト（濃紺・結論）
+ *   blockquote（> 行）                           … 「結論」ラベル付きの判断・示唆
  *   <div class="callout good|warn|danger|info">  … 色付きコールアウト
  *     good=GOOD(緑・良い点) / warn=CAUTION(黄・注意) / danger=WARNING(赤・危険) / info=INFO(青・補足)
  *     ラベル文字列は data-label="..." で上書き可能
@@ -113,14 +113,13 @@ section strong > em {
   border-bottom: 3px solid var(--zenshin-gold);
 }
 
-/* コールアウト: blockquote（> 行）は POINT（濃紺・結論）。
+/* コールアウト: blockquote（> 行）は、そのページの根拠から導く「結論」。
    <div class="callout good|warn|danger|info"> で意味に応じた色バリエーション */
 section blockquote,
 section .callout {
   position: relative;
   border: 1px solid var(--zenshin-border);
-  border-left: 6px solid var(--zenshin-gold);
-  border-radius: 0 12px 12px 0;
+  border-radius: 12px;
   background: var(--zenshin-card);
   color: var(--zenshin-ink);
   padding: 0.75em 1.1em 0.65em;
@@ -131,7 +130,7 @@ section .callout {
 
 section blockquote::before,
 section .callout::before {
-  content: 'POINT';
+  content: '結論';
   display: block;
   font-size: 0.58em;
   font-weight: 900;
@@ -140,21 +139,21 @@ section .callout::before {
   margin-bottom: 0.3em;
 }
 
-/* POINTは「このページの結論」。濃紺の面で、薄い黄色のCAUTIONと明確に区別する */
+/* 結論は装飾的な強調ではなく、比較・根拠から導いた判断を短く置く */
 section blockquote {
-  border-color: var(--zenshin-ink);
-  border-left-color: var(--zenshin-gold);
-  background: var(--zenshin-ink);
-  color: #ffffff;
-  box-shadow: 0 3px 10px rgba(12, 18, 32, 0.14);
+  border-color: #d8dde7;
+  background: #eef1f6;
+  color: var(--zenshin-ink);
+  box-shadow: none;
 }
 
 section blockquote::before {
-  color: var(--zenshin-gold-light);
+  color: var(--zenshin-ink-soft);
+  letter-spacing: 0.14em;
 }
 
 section blockquote strong {
-  color: #ffffff;
+  color: var(--zenshin-ink);
 }
 
 section .callout > p {
@@ -168,7 +167,7 @@ section .callout > ol {
 
 /* 良い点・推奨（緑） */
 section .callout.good {
-  border-left-color: #2da44e;
+  border-color: #a7d7b2;
   background: #f3f9f2;
 }
 
@@ -179,7 +178,7 @@ section .callout.good::before {
 
 /* 注意（黄）: 適用条件・導入前の確認・制約 */
 section .callout.warn {
-  border-left-color: #d4a72c;
+  border-color: #e2c36c;
   background: #fdf8e7;
 }
 
@@ -190,7 +189,7 @@ section .callout.warn::before {
 
 /* 危険・非推奨（赤） */
 section .callout.danger {
-  border-left-color: #cf222e;
+  border-color: #e6a3a8;
   background: #fcf1f0;
 }
 
@@ -201,7 +200,7 @@ section .callout.danger::before {
 
 /* 補足情報（青）: 結論を変えない背景・注記・確認日 */
 section .callout.info {
-  border-left-color: var(--zenshin-blue);
+  border-color: #9fc3ef;
   background: #eff5fd;
 }
 
@@ -327,7 +326,6 @@ section .columns.three {
 section .card {
   background: var(--zenshin-card);
   border: 1px solid var(--zenshin-border);
-  border-top: 5px solid var(--zenshin-gold);
   border-radius: 12px;
   padding: 18px 22px;
   box-shadow: 0 1px 4px rgba(12, 18, 32, 0.05);
@@ -335,6 +333,34 @@ section .card {
 
 section .card h3 {
   margin-top: 0;
+}
+
+/* 単一テーマの複数要素は、裸の2カラム箇条書きではなく視線単位が明確なカード群にする */
+section .cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0.4em 0;
+}
+
+section .cards .card {
+  padding: 12px 18px;
+  box-shadow: none;
+}
+
+section .cards .card h3 {
+  color: var(--zenshin-ink);
+  font-size: 0.92em;
+  margin: 0 0 0.2em;
+}
+
+section .cards .card p {
+  font-size: 0.88em;
+  margin: 0;
+}
+
+section .cards .card:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
 }
 
 section .stats {
