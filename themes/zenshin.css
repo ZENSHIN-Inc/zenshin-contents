@@ -316,6 +316,12 @@ section.table-followup > ol {
   margin-right: auto;
 }
 
+/* table は CSS table layout の都合で width 指定より内容幅まで縮むことがあるため、
+   補足リストと同じ読み幅を下限として固定する */
+section.table-followup > table {
+  min-width: 82%;
+}
+
 section.table-followup > table + ul,
 section.table-followup > table + ol {
   margin-top: -0.15em;

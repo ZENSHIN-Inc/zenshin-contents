@@ -28,6 +28,7 @@ interface LayoutIssue {
     | "table-cell-lines"
     | "table-cell-orphan"
     | "table-intro-layout"
+    | "table-followup-alignment"
     | "nested-list-layout";
   detail: string;
 }
@@ -148,6 +149,25 @@ try {
                   kind: "table-intro-layout",
                   detail: "表の直前に説明文があります",
                 });
+              }
+            }
+
+            // table-followup は表と直後の補足リストを同じ読み幅へそろえる指定。
+            // CSS table layout では width が内容幅へ縮むことがあるため、実測した左端で確認する。
+            if (sec.classList.contains("table-followup")) {
+              const table = sec.querySelector(":scope > table");
+              const followup = table?.nextElementSibling;
+              if (table && followup?.matches("ul, ol")) {
+                const tableRect = table.getBoundingClientRect();
+                const followupRect = followup.getBoundingClientRect();
+                const leftDiff = Math.abs(tableRect.left - followupRect.left);
+                if (leftDiff > 8) {
+                  result.push({
+                    page: i + 1,
+                    kind: "table-followup-alignment",
+                    detail: "表と補足の左端差 " + Math.round(leftDiff) + "px",
+                  });
+                }
               }
             }
 
