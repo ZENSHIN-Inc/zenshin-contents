@@ -1,5 +1,5 @@
 {
-  "theme": "base",
+  "theme": "default",
   "securityLevel": "strict",
   "flowchart": {
     "curve": "basis",
@@ -11,8 +11,6 @@
   "themeVariables": {
     "fontFamily": "Noto Sans JP, Noto Sans CJK JP, sans-serif",
     "fontSize": "30px",
-    "lineColor": "#8c6f42",
-    "edgeLabelBackground": "#fbf9f4",
-    "background": "transparent"
+    "background": "#ffffff"
   }
 }
