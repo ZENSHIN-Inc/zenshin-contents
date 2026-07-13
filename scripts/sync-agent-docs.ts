@@ -1,5 +1,6 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 
+import { execFileSync } from "node:child_process";
 import {
   existsSync,
   mkdirSync,
@@ -8,7 +9,6 @@ import {
   rmSync,
   writeFileSync,
 } from "node:fs";
-import { execFileSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -19,12 +19,20 @@ const FORCE = process.argv.includes("--force");
 const TARGETS = {
   claude: ".claude/skills",
   codex: ".agents/skills",
-};
+} as const;
 
-const normalize = (value) => value.replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trimEnd() + "\n";
+type Target = keyof typeof TARGETS;
 
-function render(template, target, skill) {
-  const other = target === "codex" ? "claude" : "codex";
+interface Plan {
+  path: string;
+  content: string | Buffer;
+}
+
+const normalize = (value: string): string =>
+  value.replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trimEnd() + "\n";
+
+function render(template: string, target: Target, skill: string): string {
+  const other: Target = target === "codex" ? "claude" : "codex";
   let result = template;
   const own = new RegExp(`\\{% if target == "${target}" %\\}([\\s\\S]*?)\\{% endif %\\}`, "g");
   const foreign = new RegExp(`\\{% if target == "${other}" %\\}([\\s\\S]*?)\\{% endif %\\}`, "g");
@@ -38,9 +46,9 @@ function render(template, target, skill) {
   return result.replace(heading[0], `${heading[0]}\n\n${banner}`);
 }
 
-function filesUnder(directory) {
+function filesUnder(directory: string): string[] {
   if (!existsSync(directory)) return [];
-  const found = [];
+  const found: string[] = [];
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
     const absolute = path.join(directory, entry.name);
     if (entry.isDirectory()) found.push(...filesUnder(absolute));
@@ -49,20 +57,34 @@ function filesUnder(directory) {
   return found;
 }
 
-function gitDirtyPaths() {
-  const output = execFileSync("git", ["status", "--porcelain=v1", "--untracked-files=all"], { cwd: ROOT, encoding: "utf8" });
-  return new Set(output.split("\n").filter((line) => line.length >= 4).map((line) => line.slice(3).split(" -> ").at(-1)));
+function gitDirtyPaths(): Set<string> {
+  const output = execFileSync("git", ["status", "--porcelain=v1", "--untracked-files=all"], {
+    cwd: ROOT,
+    encoding: "utf8",
+  });
+  return new Set(
+    output
+      .split("\n")
+      .filter((line) => line.length >= 4)
+      .map((line) => line.slice(3).split(" -> ").at(-1) ?? ""),
+  );
 }
 
-const plans = [];
-const expected = new Set();
+const toBuffer = (content: string | Buffer): Buffer =>
+  typeof content === "string" ? Buffer.from(content) : content;
+
+const plans: Plan[] = [];
+const expected = new Set<string>();
 const sourceBase = path.join(ROOT, SOURCE_ROOT);
-for (const skill of readdirSync(sourceBase, { withFileTypes: true }).filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort()) {
+for (const skill of readdirSync(sourceBase, { withFileTypes: true })
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => entry.name)
+  .sort()) {
   const skillSource = path.join(sourceBase, skill);
   const templatePath = path.join(skillSource, "SKILL.md.liquid");
   if (!existsSync(templatePath)) continue;
   const template = readFileSync(templatePath, "utf8");
-  for (const [target, targetRoot] of Object.entries(TARGETS)) {
+  for (const [target, targetRoot] of Object.entries(TARGETS) as Array<[Target, string]>) {
     const destinationRoot = path.join(ROOT, targetRoot, skill);
     const skillPath = path.join(destinationRoot, "SKILL.md");
     plans.push({ path: skillPath, content: render(template, target, skill) });
@@ -70,8 +92,8 @@ for (const skill of readdirSync(sourceBase, { withFileTypes: true }).filter((ent
     for (const layer of ["common", target]) {
       const layerRoot = path.join(skillSource, layer);
       for (const source of filesUnder(layerRoot)) {
-        const relative = path.relative(layerRoot, source);
-        const destination = path.join(destinationRoot, relative);
+        const relativePath = path.relative(layerRoot, source);
+        const destination = path.join(destinationRoot, relativePath);
         plans.push({ path: destination, content: readFileSync(source) });
         expected.add(path.relative(ROOT, destination));
       }
@@ -80,8 +102,12 @@ for (const skill of readdirSync(sourceBase, { withFileTypes: true }).filter((ent
 }
 
 const generatedRoots = Object.values(TARGETS).map((value) => path.join(ROOT, value));
-const stale = generatedRoots.flatMap(filesUnder).filter((file) => !expected.has(path.relative(ROOT, file)));
-const changed = plans.filter(({ path: file, content }) => !existsSync(file) || !readFileSync(file).equals(Buffer.from(content)));
+const stale = generatedRoots
+  .flatMap(filesUnder)
+  .filter((file) => !expected.has(path.relative(ROOT, file)));
+const changed = plans.filter(
+  ({ path: file, content }) => !existsSync(file) || !readFileSync(file).equals(toBuffer(content)),
+);
 
 if (CHECK) {
   if (changed.length === 0 && stale.length === 0) {
@@ -100,7 +126,9 @@ if (!FORCE) {
     .map((file) => path.relative(ROOT, file))
     .filter((file) => dirty.has(file));
   if (overwrites.length > 0) {
-    console.error("❌ 生成先に未コミット変更があるため停止しました。正本へ移すか、破棄してよい場合だけ --force を使ってください:");
+    console.error(
+      "❌ 生成先に未コミット変更があるため停止しました。正本へ移すか、破棄してよい場合だけ --force を使ってください:",
+    );
     for (const file of overwrites) console.error(`  dirty: ${file}`);
     process.exit(1);
   }
