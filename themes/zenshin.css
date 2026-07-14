@@ -283,6 +283,13 @@ section table {
   margin: 0.45em auto 1.1em;
 }
 
+/* CSS table layout は指定 width より内容幅まで縮むことがあり、縮んだ表は
+   中央からずれて見える原因になる。直下の表は 82% の読み幅を下限として固定する
+   （table-followup だけでなく全ての表ページへ適用） */
+section > table {
+  min-width: 82%;
+}
+
 /* 表ページは表を基準に一つの中央カラムとして読む。
    表より後ろの本文・リスト・コールアウトが表幅から外へ広がらないようにする */
 section > table ~ p:not(.note),

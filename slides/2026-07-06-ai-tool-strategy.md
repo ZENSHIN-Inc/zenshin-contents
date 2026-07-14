@@ -94,7 +94,7 @@ footer: © ZENSHIN Inc.
 
 # 知能だけでなくコスパでも見る
 
-![w:530](../assets/slides/2026-07-06-ai-tool-strategy/aa-intelligence-vs-cost.png)
+![w:470](../assets/slides/2026-07-06-ai-tool-strategy/aa-intelligence-vs-cost.png)
 
 左上ほど優秀。**GPT-5.6 Sol は Fable 5 に 1 点差で、コストは約 3 分の 1**。
 Opus 4.8 を上回り、GPT 系の優位が鮮明になった。
@@ -107,7 +107,7 @@ Opus 4.8 を上回り、GPT 系の優位が鮮明になった。
 
 # タイパ（速度）でも見る
 
-![w:530](../assets/slides/2026-07-06-ai-tool-strategy/aa-intelligence-vs-time.png)
+![w:470](../assets/slides/2026-07-06-ai-tool-strategy/aa-intelligence-vs-time.png)
 
 **GPT-5.6 Sol は 83 tokens/s**。Fable 5（63）より速く、Opus 4.8 より高性能。
 速度まで含めると、Sol の優位はさらに大きい。

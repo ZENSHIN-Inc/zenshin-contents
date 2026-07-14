@@ -28,6 +28,7 @@ interface LayoutIssue {
     | "table-cell-lines"
     | "table-cell-orphan"
     | "table-intro-layout"
+    | "table-centering"
     | "table-followup-alignment"
     | "nested-list-layout";
   detail: string;
@@ -149,6 +150,32 @@ try {
                   kind: "table-intro-layout",
                   detail: "表の直前に説明文があります",
                 });
+              }
+            }
+
+            // 表はテーマが中央 82% 幅へ置く想定。CSS table layout の縮みなどで
+            // 中央からずれたページを、セクションの content box に対する左右余白の実測差で検知する。
+            {
+              const secStyle = getComputedStyle(sec);
+              const secRect = sec.getBoundingClientRect();
+              const contentLeft = secRect.left + parseFloat(secStyle.paddingLeft);
+              const contentRight = secRect.right - parseFloat(secStyle.paddingRight);
+              for (const table of sec.querySelectorAll(":scope > table")) {
+                const rect = table.getBoundingClientRect();
+                const leftGap = rect.left - contentLeft;
+                const rightGap = contentRight - rect.right;
+                if (Math.abs(leftGap - rightGap) > 8) {
+                  result.push({
+                    page: i + 1,
+                    kind: "table-centering",
+                    detail:
+                      "表の左右余白が非対称です（左" +
+                      Math.round(leftGap) +
+                      "px / 右" +
+                      Math.round(rightGap) +
+                      "px）",
+                  });
+                }
               }
             }
 
