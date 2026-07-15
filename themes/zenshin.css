@@ -2,7 +2,7 @@
 /* @size 16:9 1280px 720px */
 /* @size 4:3 960px 720px */
 /*
- * ZENSHIN ブランドテーマ v2.10
+ * ZENSHIN ブランドテーマ v2.11
  * - スライドサイズは 16:9（1280x720）が既定。frontmatter にも `size: 16:9` を明記する
  * - 本文 22px / line-height 1.65（v2.3 で 25px から縮小。縮小で生まれた領域は文字数を増やす余地ではなく
  *   要素間の余白＝行間・箇条書き間・コールアウト前後に充てる設計）
@@ -22,6 +22,7 @@
  *                                                   全章の番号付きリストを置き、現在地の章だけ **太字** にする）
  *   <div class="columns"> A / B </div>          … 2 カラム（<div class="columns three"> で 3 カラム）
  *   <div class="card"> ### 見出し + 本文 </div>  … A/B 対比など独立したグループ用のカード
+ *   <div class="card good|danger"> … 良い／悪いを左右で比べるときの緑／赤アクセントカード
  *   <!-- _class: detail-list -->                 … 親項目だけに●を置き、説明はマーカーなしで一段下げるリスト
  *   <!-- _class: table-followup -->              … 表と直後の補足リストを同じ幅・左端へそろえる
  *   <div class="stats">
@@ -481,6 +482,26 @@ section .card {
 
 section .card h3 {
   margin-top: 0;
+}
+
+/* 肯定／否定が明確な左右対比だけに使う意味色。
+   全面を強く塗らず、薄い背景・枠・見出し色で比較の方向を素早く読ませる */
+section .card.good {
+  border-color: #a7d7b2;
+  background: #f3f9f2;
+}
+
+section .card.good h3 {
+  color: #1a7f37;
+}
+
+section .card.danger {
+  border-color: #e6a3a8;
+  background: #fcf1f0;
+}
+
+section .card.danger h3 {
+  color: #cf222e;
 }
 
 section .stats {
