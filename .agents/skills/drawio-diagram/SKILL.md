@@ -5,7 +5,8 @@ description: >
   **Use this skill whenever the user mentions** draw.io / drawio / diagrams.net / `.drawio` /
   draw.io で構成図・アーキテクチャ図・スイムレーン・ネットワーク図・複雑な接続図を作りたい、
   または既存の draw.io 図をスライドへ埋め込みたい、と言ったとき。
-  単純なフロー・分岐・時系列は zenshin-slide の Mermaid を優先し、精密配置・固有アイコン・手動編集性が必要な図だけ本スキルを使う。
+  構成図・アーキテクチャ図など境界・配置に意味がある図は明示依頼がなくても本スキルを積極的に使い、
+  流れを見せる単純なフロー・分岐・時系列だけ zenshin-slide の Mermaid にする。
 ---
 
 # drawio-diagram Skill（編集可能な図をスライドへ埋め込む）
@@ -18,9 +19,9 @@ description: >
 
 ## Mermaid との選択
 
-- **Mermaidを使う**: 標準的なフロー、Yes / No分岐、シーケンス、時系列、3〜10要素程度の因果関係。テキスト差分を主な編集手段にしたい場合
-- **draw.ioを使う**: システム境界の入れ子、スイムレーン、クラウド・ネットワーク固有アイコン、10要素を超える複雑な接続、位置や経路を手で詰めたい場合
-- Mermaidで十分な図を「見栄えのためだけ」にdraw.ioへ移さない。同じ情報をMermaidとdraw.ioの両方で管理しない
+- **draw.ioを使う（構造図の第一候補）**: 構成図・アーキテクチャ図・関係図など「境界・配置」に意味がある図全般。システム境界の入れ子、スイムレーン、クラウド・ネットワーク固有アイコン、多対多の接続、位置や経路を手で詰めたい場合。該当するなら明示依頼を待たず積極的に使う
+- **Mermaidを使う**: 標準的なフロー、Yes / No分岐、シーケンス、時系列など「流れ」を見せる図。テキスト差分を主な編集手段にしたい場合
+- 迷ったら「**流れならMermaid、境界と配置ならdraw.io**」で決める。同じ情報をMermaidとdraw.ioの両方で管理しない
 - draw.io図は生成画像の挿絵ではなく構造図として扱うため、明示的な挿絵依頼は不要。ただしスライド全体へ機械的に増やさない
 
 ## 保存場所
@@ -45,8 +46,9 @@ assets/slides/<デッキ slug>/<図名>.svg
    - 精密配置や固有シェイプが必要なら`.drawio` XMLを直接作る。手書きする前に`references/xml-authoring.md`を読む
    - 既存`.drawio`の軽微な修正は、対象セルだけを編集してレイアウト全体を壊さない
 4. **SVGを書き出す**: 同梱の`bash scripts/export-slide-svg.sh <input.drawio> <output.svg>`を使う
-5. **Marpへ埋め込む**: 通常は `![w:960](../assets/slides/<デッキ slug>/<図名>.svg)`。結論文と同居する場合は`w:900`以下から調整する
-6. **検証する**: 対象デッキをPNG/PDFへ変換し、図を入れたページだけ目視する。最後に`bun run ci`を通す
+5. **図単体を目視する**: 同梱の`bash scripts/export-check-png.sh <input.drawio> <確認用.png>`で確認用PNGを一時ディレクトリへ出し、構図・文字・接続線をチェックする
+6. **Marpへ埋め込む**: 通常は `![w:960](../assets/slides/<デッキ slug>/<図名>.svg)`。結論文と同居する場合は`w:900`以下から調整する
+7. **ページ側で検証する**: `bun run ci`を通し、`dist/slides/<デッキ>.pdf`の該当ページを目視する（例: `pdftoppm -f <頁> -l <頁> -r 100 -png dist/slides/<デッキ>.pdf <出力先>`でPNG化して確認）
 
 ## draw.io Desktop CLI
 
