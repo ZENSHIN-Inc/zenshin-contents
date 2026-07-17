@@ -11,7 +11,7 @@ ZENSHIN のスライド・CG などを公開するコンテンツハブ（Marp +
 ```
 slides/    Marp 原稿（1 ファイル = 1 デッキ、YYYY-MM-DD-<slug>.md）
 gallery/   CG・生成画像などの公開素材（<YYYYMM>-<slug>/ で分ける）
-assets/    ブランド素材（ロゴ・favicon。zenshin-hp 由来）
+assets/    ブランド素材（ロゴ・favicon・著者アバター。zenshin-hp 由来）
 themes/    Marp カスタムテーマ（zenshin.css）
 scripts/   ビルドスクリプト（TypeScript / Bun 実行）
 dist/      ビルド成果物（git 管理外、CI が生成）
@@ -44,7 +44,19 @@ bun install
 2. main に push すると、数分で公開 URL に反映される
    - HTML: `/slides/<ファイル名>.html`
    - PDF: `/slides/<ファイル名>.pdf`（Docswell などへのアップロード・配布用）
+   - OGP 画像: `/slides/<ファイル名>-og.png`（zenshin-hp の技術ブログと同じ意匠で自動生成）
    - トップページの一覧にも自動で載る
+
+## zenshin-hp との連携（dist/index.json）
+
+ビルド時にデッキメタデータのフィード `dist/index.json` を生成する。
+zenshin-hp が Astro Content Layer のローダーからビルド時に fetch し、
+技術ブログの記事とスライドを同じ一覧ページに並べるためのデータソース。
+
+- スキーマ: `version` / `site` / `generatedAt` / `decks[]`（`slug` / `title` / `description` / `date` / `author` / `urls.{page,pdf,thumbnail,ogImage}`）
+- `author` は zenshin-hp の members コレクションの ID（HP 側で氏名・顔写真を解決する）
+- **スキーマを変える場合は zenshin-hp 側のローダーと合わせて `version` を上げる**
+- OGP 画像の意匠（ゴールド枠 + ネイビー + 著者アイコン）は zenshin-hp の `src/lib/og-image.ts` から `scripts/og-image.ts` に移植したもの。HP 側のデザインが変わったら追従する
 
 ## ローカルプレビュー
 

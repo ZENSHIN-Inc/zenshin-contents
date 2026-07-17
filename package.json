@@ -19,8 +19,11 @@
   },
   "homepage": "https://contents.zenshin-inc.co.jp/",
   "devDependencies": {
+    "@fontsource/noto-sans-jp": "^5.2.9",
     "@marp-team/marp-cli": "^4.4.1",
     "@types/bun": "^1.3.14",
+    "satori": "^0.28.0",
+    "sharp": "^0.35.3",
     "typescript": "^7.0.2"
   },
   "engines": {

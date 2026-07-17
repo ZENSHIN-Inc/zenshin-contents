@@ -11,6 +11,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { marpCli } from "@marp-team/marp-cli";
+import { renderOgImage } from "./og-image";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SLIDES_DIR = path.join(ROOT, "slides");
@@ -21,6 +22,15 @@ const DIST = path.join(ROOT, "dist");
 const SITE_TITLE = "ZENSHIN Contents";
 const SITE_DESCRIPTION = "ZENSHIN のスライド・CG などを公開するコンテンツハブ";
 const SITE_ORIGIN = "https://contents.zenshin-inc.co.jp";
+
+// デッキの著者（現状は全デッキ共通）。id は zenshin-hp の members コレクションの ID で、
+// zenshin-hp 側が index.json からこの ID で著者情報（氏名・顔写真）を解決できるようにしている
+const AUTHOR = {
+  id: "05-takahashi",
+  name: "高橋 俊",
+  role: "CTO / 技術責任者",
+  imagePath: path.join(ROOT, "assets", "authors", "takahashi.jpg"),
+};
 const IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"]);
 
 // marp-cli は process.cwd() 基準でパスを解決する
@@ -116,8 +126,18 @@ const decks: Deck[] = slideFiles.map((file) => {
 // ---------------------------------------------------------------------------
 
 if (decks.length > 0) {
-  // HTML はデッキごとに変換し、OGP メタ（og:title / og:description / og:image / og:url）を注入する。
-  // og:image には後続のサムネイル生成で作る 1 ページ目 PNG を使う
+  // OGP 画像（1200x630）をデッキごとに生成する。ブランド意匠は zenshin-hp の技術ブログ OGP と統一
+  console.log("Building OG images...");
+  for (const deck of decks) {
+    const png = await renderOgImage({
+      label: "スライド | 株式会社ZENSHIN",
+      title: deck.title,
+      author: AUTHOR,
+    });
+    fs.writeFileSync(path.join(DIST, "slides", `${deck.base}-og.png`), png);
+  }
+
+  // HTML はデッキごとに変換し、OGP メタ（og:title / og:description / og:image / og:url）を注入する
   console.log("Building HTML...");
   for (const deck of decks) {
     await marp([
@@ -131,7 +151,7 @@ if (decks.length > 0) {
       "--url",
       `${SITE_ORIGIN}/slides/${deck.base}.html`,
       "--og-image",
-      `${SITE_ORIGIN}/slides/${deck.base}.png`,
+      `${SITE_ORIGIN}/slides/${deck.base}-og.png`,
     ]);
   }
 
@@ -309,6 +329,33 @@ fs.writeFileSync(
     rel: "../",
   }),
 );
+
+// ---------------------------------------------------------------------------
+// 6. デッキメタデータのフィード（dist/index.json）
+// ---------------------------------------------------------------------------
+// zenshin-hp が Astro Content Layer のローダーからビルド時に fetch し、
+// 技術ブログの記事とスライドを同じ一覧に並べるためのデータソース。
+// スキーマを変える場合は zenshin-hp 側のローダーと合わせて version を上げる
+
+const feed = {
+  version: 1,
+  site: SITE_ORIGIN,
+  generatedAt: new Date().toISOString(),
+  decks: decks.map((d) => ({
+    slug: d.base,
+    title: d.title,
+    description: d.description,
+    date: d.date,
+    author: AUTHOR.id,
+    urls: {
+      page: `${SITE_ORIGIN}/slides/${d.base}.html`,
+      pdf: `${SITE_ORIGIN}/slides/${d.base}.pdf`,
+      thumbnail: `${SITE_ORIGIN}/slides/${d.base}.png`,
+      ogImage: `${SITE_ORIGIN}/slides/${d.base}-og.png`,
+    },
+  })),
+};
+fs.writeFileSync(path.join(DIST, "index.json"), `${JSON.stringify(feed, null, 2)}\n`);
 
 console.log(`Done: ${decks.length} deck(s), ${galleryGroups.length} gallery group(s) -> dist/`);
 
