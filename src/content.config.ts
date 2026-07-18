@@ -9,14 +9,19 @@
 import { defineCollection, reference } from "astro:content";
 import { z } from "astro/zod";
 import { file, glob } from "astro/loaders";
+import { validateTitleWidth } from "./lib/title-width";
 
 const blog = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./src/content/blog" }),
   schema: z.object({
-    // OGP は 2 行想定で最大 40 文字まで。1 行目と 2 行目を分けたい場合は
-    // frontmatter で `"1 行目\n2 行目"` のようにダブルクォートで改行を明示する。
-    // 超過するとビルド時に Zod バリデーションで失敗する
-    title: z.string().max(40),
+    // OGP で自動改行が発生しない幅（全角換算 26 文字/行）まで。
+    // 意図的に 2 行へ分けたい場合は frontmatter で `"1 行目\n2 行目"` のように
+    // ダブルクォートで改行を明示する（各行が上限内なら OK）。
+    // 超過するとビルド時に Zod バリデーションで失敗する（詳細: src/lib/title-width.ts）
+    title: z.string().superRefine((title, ctx) => {
+      const error = validateTitleWidth(title);
+      if (error) ctx.addIssue({ code: "custom", message: error });
+    }),
     date: z.coerce.date(),
     // 複数タグ対応。最低 1 個必須（サイドナビ・タグページ生成の前提）、最大 6 個
     tags: z.array(z.string()).min(1).max(6),

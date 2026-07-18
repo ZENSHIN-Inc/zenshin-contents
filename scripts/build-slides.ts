@@ -19,6 +19,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { marpCli } from "@marp-team/marp-cli";
 import { renderOgImage } from "../src/lib/og-image";
+import { validateTitleWidth } from "../src/lib/title-width";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SLIDES_DIR = path.join(ROOT, "slides");
@@ -135,6 +136,15 @@ const decks: Deck[] = slideFiles.map((file) => {
 // 3. Marp ビルド + OGP 画像生成
 // ---------------------------------------------------------------------------
 
+// タイトルの幅検証（OGP で自動改行が発生しない長さかをブログと同じ基準でチェック）
+for (const deck of decks) {
+  const error = validateTitleWidth(deck.title);
+  if (error) {
+    console.error(`slides/${deck.base}.md: ${error}`);
+    process.exit(1);
+  }
+}
+
 if (decks.length > 0) {
   // OGP 画像（1200x630）をデッキごとに生成する。ブランド意匠は zenshin-hp の技術ブログ OGP と統一
   console.log("Building OG images...");
@@ -145,7 +155,7 @@ if (decks.length > 0) {
   };
   for (const deck of decks) {
     const png = await renderOgImage({
-      label: "スライド | 株式会社ZENSHIN",
+      label: "スライド資料 | 株式会社ZENSHIN",
       title: deck.title,
       author,
       date: deck.date ? deck.date.replaceAll("-", ".") : undefined,

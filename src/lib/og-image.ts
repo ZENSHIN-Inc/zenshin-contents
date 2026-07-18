@@ -11,6 +11,7 @@ import fs from "node:fs";
 import path from "node:path";
 import satori from "satori";
 import sharp from "sharp";
+import { maxLineEm } from "./title-width";
 
 // Astro のプリレンダーはこのモジュールを dist/ 配下へ再配置するため、
 // import.meta.url 基準ではなく cwd（= リポジトリルートで実行される前提）で解決する。
@@ -83,6 +84,12 @@ async function toPngDataUri(absolutePath: string, size: number): Promise<string>
 export async function renderOgImage({ label, title, author, date }: OgOptions): Promise<Buffer> {
   contextPromise ??= loadContext();
   const { fonts, logoDataUri } = await contextPromise;
+
+  // タイトルは自動改行させず、1 行（明示 "\n" 区切りなら各行）が内側コンテンツ幅
+  // （1200 - 枠 24x2 - padding 64x2 = 1072px）に収まるようフォントサイズを縮小する。
+  // 下限は title-width.ts の MAX_TITLE_EM（26em）によるビルド時検証が保証する（約 41px）
+  const contentWidth = OG_WIDTH - BORDER_WIDTH * 2 - 64 * 2;
+  const titleFontSize = Math.min(52, Math.floor(contentWidth / maxLineEm(title)));
   // OGP 表示サイズは 88px。Retina 2x + sharp の SVG パース上限の余裕をみて 200px でクロップ
   const authorImageDataUri = author ? await toPngDataUri(author.imagePath, 200) : null;
 
@@ -219,11 +226,13 @@ export async function renderOgImage({ label, title, author, date }: OgOptions): 
                           width: "100%",
                           marginBottom: "40px",
                           color: COLOR.foreground,
-                          fontSize: "52px",
+                          fontSize: `${titleFontSize}px`,
                           fontWeight: 700,
                           textAlign: "center",
                           lineHeight: 1.3,
-                          whiteSpace: "pre-wrap",
+                          // 自動改行は許可しない（フォント自動縮小で 1 行に収める）。
+                          // "pre" なので title 内の明示的な "\n" だけが改行になる
+                          whiteSpace: "pre",
                         },
                         children: title,
                       },

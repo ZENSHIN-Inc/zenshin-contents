@@ -55,7 +55,7 @@ bun run dev:marp   # Marp のライブプレビューだけ欲しいとき
 
    ```markdown
    ---
-   title: 記事タイトル（OGP 2 行制約で最大 40 文字）
+   title: 記事タイトル（OGP で改行しない全角換算 28 文字まで。20 文字以内推奨）
    date: 2026-07-17
    tags: [Web, Astro]        # 1〜6 個
    description: 一覧・OGP に出る説明文
@@ -77,7 +77,7 @@ bun run dev:marp   # Marp のライブプレビューだけ欲しいとき
    marp: true
    theme: zenshin
    paginate: true
-   title: スライドのタイトル
+   title: スライドのタイトル（OGP で改行しない全角換算 28 文字まで。20 文字以内推奨）
    tags: [AI, 技術選定]   # ブログと共通のタグ（/tags/ ページ・サイドバー集計に載る）
    description: 一覧ページに表示される説明文
    footer: © ZENSHIN Inc.

@@ -11,7 +11,7 @@ Astro 7 + Tailwind 4 の静的サイト（Cloudflare Pages）で、main に push
 
 ## ディレクトリ構成
 
-- `src/content/blog/` — ブログ記事（`YYYY-MM-DD-<slug>.md`）。frontmatter は `src/content.config.ts` の Zod スキーマ（title 40 文字・tags 1〜6・author 必須）。`published: false` でドラフト（dev のみ表示）
+- `src/content/blog/` — ブログ記事（`YYYY-MM-DD-<slug>.md`）。frontmatter は `src/content.config.ts` の Zod スキーマ（title は OGP で改行しない幅 = 全角換算 28 文字/行まで・tags 1〜6・author 必須）。`published: false` でドラフト（dev のみ表示）
 - `src/content/authors/` — 著者情報（アバター画像は `src/assets/images/authors/`）
 - `src/pages/` — トップ（ブログ + スライド混在一覧）・`/blog/`・`/slides/`・`/tags/`・`/archive/`（タグ・月別アーカイブはブログ + スライド共通）・OGP 画像エンドポイント・`/index.json`（zenshin-hp 向けフィード）・`/rss.xml`
 - `src/lib/og-image.ts` — OGP 画像レンダラー（satori + sharp、1200x630）。ブログ・スライド共用。意匠は zenshin-hp の `src/lib/og-image.ts` 由来
