@@ -26,7 +26,7 @@ const ASSETS_DIR = path.join(ROOT, "assets");
 const PUBLIC = path.join(ROOT, "public");
 const DATA_DIR = path.join(ROOT, "src", "data");
 
-const SITE_ORIGIN = "https://contents.zenshin-inc.co.jp";
+const SITE_ORIGIN = "https://tech.zenshin-inc.co.jp";
 const IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"]);
 
 // デッキの著者（現状は全デッキ共通）。src/content/authors/ のコレクション ID

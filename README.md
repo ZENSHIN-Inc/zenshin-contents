@@ -1,9 +1,9 @@
-# zenshin-contents — ZENSHIN Tech
+# zenshin-tech — ZENSHIN Tech
 
 株式会社ZENSHINの技術メディア **ZENSHIN Tech**（技術ブログ + スライド + ギャラリー）。
 Astro 7 製の静的サイトで、Marp スライドのビルドパイプラインを内蔵しています。
 
-- **公開 URL**: https://contents.zenshin-inc.co.jp/
+- **公開 URL**: https://tech.zenshin-inc.co.jp/
   - DNS（CNAME）は zenshin-infra の Terraform で管理
 - main に push すると GitHub Actions がビルドして Cloudflare Pages へデプロイします（完全 CLI 運用・**push = 即公開**）
 - 技術ブログは zenshin-hp（www.zenshin-inc.co.jp）から 2026-07 に移設。旧 `/blog/*` URL は HP 側で 301 リダイレクト

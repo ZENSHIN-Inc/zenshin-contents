@@ -13,15 +13,15 @@ description: >
 
 > Claude Code 用の派生スキルです。正本は `docs/agent-instructions/skills/gallery-image-gen/SKILL.md.liquid`。`bun run sync:agent-docs` で生成するため、直接編集しないでください。
 
-> **Core Principle**: 画像生成は **Codex の組み込み `image_gen`（gpt-image-2）** で行い、**ChatGPT サブスク内で完結させる（OpenAI API の従量課金ルートに入らない）**。生成した画像は `gallery/<YYYYMM>-<slug>/` に置き、main に push されると https://contents.zenshin-inc.co.jp/gallery/ で公開される。
+> **Core Principle**: 画像生成は **Codex の組み込み `image_gen`（gpt-image-2）** で行い、**ChatGPT サブスク内で完結させる（OpenAI API の従量課金ルートに入らない）**。生成した画像は `gallery/<YYYYMM>-<slug>/` に置き、main に push されると https://tech.zenshin-inc.co.jp/gallery/ で公開される。
 
 ## 置き場所と公開 URL（gallery/README.md の規約に従う）
 
 - 置き場所: `gallery/<YYYYMM>-<slug>/<ファイル名>.png`（`gallery/` 直下に直接置かない。1 案件・1 テーマにつき 1 フォルダ）
 - フォルダ名は「年月 + 内容がわかる英語ケバブケーススラッグ」（例: `202607-ai-seminar/`）
 - 公開 URL（main に push 後）:
-  - 一覧: https://contents.zenshin-inc.co.jp/gallery/
-  - 直リンク: `https://contents.zenshin-inc.co.jp/gallery/<フォルダ名>/<ファイル名>`
+  - 一覧: https://tech.zenshin-inc.co.jp/gallery/
+  - 直リンク: `https://tech.zenshin-inc.co.jp/gallery/<フォルダ名>/<ファイル名>`
 - サイズ目安: 1 ファイル 5MB 以下・長辺 2400px 以下（gpt-image-2 の 1536x1024 / 1024x1536 なら通常問題ない）
 - **push = 社外公開**。commit / push はユーザーの明示指示があるまでしない（リポジトリ運用方針）。push 前に「公開されます」を一言添える
 

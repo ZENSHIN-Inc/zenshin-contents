@@ -1,5 +1,5 @@
 {
-  "name": "zenshin-contents",
+  "name": "zenshin-tech",
   "version": "0.0.1",
   "private": true,
   "description": "ZENSHIN の技術メディア ZENSHIN Tech（Astro + Marp + Cloudflare Pages）",
@@ -19,9 +19,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ZENSHIN-Inc/zenshin-contents.git"
+    "url": "git+https://github.com/ZENSHIN-Inc/zenshin-tech.git"
   },
-  "homepage": "https://contents.zenshin-inc.co.jp/",
+  "homepage": "https://tech.zenshin-inc.co.jp/",
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
     "@fontsource/noto-sans-jp": "^5.2.9",

@@ -46,7 +46,7 @@ description: >
 - ファイル名: `<内容がわかる英語slug>.png`（例 `three-companies.png`）。**ページ番号を入れない**（ページの増減で番号がズレて対応が壊れる。どのページで使っているかはスライド md 内の参照行で追える）
 - スライドからの参照は**相対パス**: `![...](../gallery/<YYYYMM>-<デッキslug>/<slug>.png)`
   - ビルド時、slides/*.md → dist/slides/*.html、gallery/ → dist/gallery/ にコピーされるため、`../gallery/...` は**リポジトリ内でも公開サイト上でも同じ相対関係で解決する**（ロゴの `../assets/brand/...` と同じ仕組み）
-- 副産物として、同じ画像がギャラリー一覧 https://contents.zenshin-inc.co.jp/gallery/ にも自動掲載され、直リンクも得られる
+- 副産物として、同じ画像がギャラリー一覧 https://tech.zenshin-inc.co.jp/gallery/ にも自動掲載され、直リンクも得られる
 
 ## 差し込みパターン（Marp 記法）
 

@@ -1,11 +1,11 @@
-# zenshin-contents — ZENSHIN Tech
+# zenshin-tech — ZENSHIN Tech
 
 ## プロジェクト概要
 
 株式会社ZENSHINの技術メディア **ZENSHIN Tech**（技術ブログ + Marp スライド + ギャラリー）。
 Astro 7 + Tailwind 4 の静的サイト（Cloudflare Pages）で、main に push すると GitHub Actions が自動でビルド・デプロイする（**push = 社外公開**）。
 
-- 公開 URL: https://contents.zenshin-inc.co.jp/
+- 公開 URL: https://tech.zenshin-inc.co.jp/
 - 技術ブログは zenshin-hp から 2026-07 に移設（旧 www の `/blog/*` は HP 側で 301）
 - 詳細な構成・運用は `README.md` を参照
 

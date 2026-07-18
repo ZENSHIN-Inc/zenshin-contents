@@ -30,7 +30,7 @@ export const GET: APIRoute = async (context) => {
   return rss({
     title: "ZENSHIN Tech",
     description: "株式会社ZENSHINの技術メディア。技術ブログ・スライドを発信しています。",
-    site: context.site ?? "https://contents.zenshin-inc.co.jp",
+    site: context.site ?? "https://tech.zenshin-inc.co.jp",
     items,
     customData: "<language>ja</language>",
   });

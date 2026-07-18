@@ -5,7 +5,7 @@ name: Deploy to Cloudflare Pages
 #
 # 必要 secrets:
 #   - CLOUDFLARE_API_TOKEN
-#     - 名前: `zenshin-contents / Pages Deploy`（Account-owned・Pages Write のみ）
+#     - 名前: `zenshin-tech / Pages Deploy`（Account-owned・Pages Write のみ）
 #     - **Token と GitHub Actions Secret は zenshin-infra で Terraform 管理**
 #       (zenshin-infra/terraform/cloudflare/cloudflare-tokens.tf §O)。本リポでは手動編集禁止
 #   - CLOUDFLARE_ACCOUNT_ID は Org 変数（vars）を使用
@@ -52,4 +52,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=zenshin-contents --commit-dirty=true --branch=main
+          command: pages deploy dist --project-name=zenshin-tech --commit-dirty=true --branch=main
