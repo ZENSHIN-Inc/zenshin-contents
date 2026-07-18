@@ -1,0 +1,127 @@
+---
+/**
+ * トップページ（ZENSHIN Tech）
+ * ブログ記事とスライドを日付降順でマージした技術コンテンツ一覧。
+ * 右サイドに BlogSidebar（タグ・月別アーカイブ）を配置
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import ArticleCard from "@/components/ArticleCard.astro";
+import BlogSidebar from "@/components/BlogSidebar.astro";
+import { getCollection } from "astro:content";
+import { ROUTES } from "@/consts/routes";
+import { filterPublished } from "@/lib/drafts";
+
+const posts = filterPublished(await getCollection("blog"));
+const slides = await getCollection("slides");
+
+/** blog / slides をカード表示用に正規化した 1 件分 */
+interface ContentItem {
+  contentType: "article" | "slide";
+  href: string;
+  ogImageSrc: string;
+  title: string;
+  tags: string[];
+  date: Date;
+  external: boolean;
+  pdfHref?: string;
+  isDraft?: boolean;
+}
+
+const articleItems: ContentItem[] = posts.map((post) => ({
+  contentType: "article",
+  href: ROUTES.blogPost(post.data.slug),
+  ogImageSrc: ROUTES.ogImageBlog(post.data.slug),
+  title: post.data.title,
+  tags: post.data.tags,
+  date: post.data.date,
+  external: false,
+  isDraft: !post.data.published,
+}));
+
+// スライドのサムネは 1 ページ目 PNG（16:9）。カードの 1200/630 枠に object-cover で収める。
+// スライド HTML は単体表示（サイトのヘッダーなし）なので新しいタブで開く
+const slideItems: ContentItem[] = slides.map((slide) => ({
+  contentType: "slide",
+  href: slide.data.urls.page,
+  ogImageSrc: slide.data.urls.thumbnail,
+  title: slide.data.title,
+  tags: [],
+  date: slide.data.date,
+  external: true,
+  pdfHref: slide.data.urls.pdf,
+}));
+
+const allItems = [...articleItems, ...slideItems].sort(
+  (a, b) => b.date.getTime() - a.date.getTime()
+);
+---
+
+<BaseLayout
+  title="ZENSHIN Tech | 株式会社ZENSHINの技術メディア"
+  description="株式会社ZENSHINの技術メディア。AI駆動開発の技術情報やプロジェクト事例を、技術ブログとスライドで発信しています。"
+>
+  <Header />
+
+  <!-- ヒーロー帯 — メディア名 + 説明 -->
+  <section class="bg-surface-dark pt-28 pb-10">
+    <div class="mx-auto max-w-6xl px-6 lg:px-8">
+      <p class="font-display text-sm font-bold tracking-wider text-label">株式会社ZENSHIN 技術メディア</p>
+      <h1 class="mt-2 text-3xl font-bold text-on-surface-dark md:text-4xl">ZENSHIN Tech</h1>
+      <p class="mt-3 max-w-2xl text-sm leading-relaxed text-on-surface-dark/75 md:text-base">
+        AI駆動開発の技術情報やプロジェクト事例を、技術ブログとスライドで発信しています。
+      </p>
+    </div>
+  </section>
+
+  <main id="main-content" class="flex-1 bg-surface">
+    <section class="bg-surface section-padding">
+      <div class="mx-auto max-w-6xl px-6 lg:px-8">
+        <div data-animate>
+          <h2 class="text-2xl font-bold text-primary md:text-3xl">
+            最新のコンテンツ
+          </h2>
+        </div>
+
+        <div class="mt-10 lg:grid lg:grid-cols-[minmax(0,1fr)_240px] lg:gap-10 xl:grid-cols-[minmax(0,1fr)_260px]">
+          {/* 記事・スライドのグリッド */}
+          <div class="min-w-0">
+            {
+              allItems.length > 0 ? (
+                <ul class="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2">
+                  {allItems.map((item, i) => (
+                    <ArticleCard
+                      href={item.href}
+                      ogImageSrc={item.ogImageSrc}
+                      title={item.title}
+                      tags={item.tags}
+                      date={item.date}
+                      contentType={item.contentType}
+                      external={item.external}
+                      pdfHref={item.pdfHref}
+                      linkable
+                      delay={String(Math.min(i + 1, 5))}
+                      isDraft={item.isDraft}
+                    />
+                  ))}
+                </ul>
+              ) : (
+                <div class="text-center">
+                  <p class="text-lg text-muted">コンテンツはまだありません。</p>
+                </div>
+              )
+            }
+          </div>
+
+          {/* サイドバー */}
+          <aside class="mt-12 lg:mt-0" aria-label="ブログナビゲーション">
+            <BlogSidebar class="lg:sticky lg:top-24" />
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>

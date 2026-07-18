@@ -1,0 +1,38 @@
+---
+/**
+ * パンくずリスト JSON-LD 構造化データコンポーネント
+ * Google のリッチリザルト（検索結果の階層表示）に使用される
+ *
+ * 使用例:
+ *   import { ROUTES } from "@/consts/routes";
+ *   <BreadcrumbJsonLd items={[
+ *     { name: "ホーム", path: ROUTES.home },
+ *     { name: "採用情報", path: ROUTES.recruit },
+ *     { name: "FDE（Forward Deployed Engineer）", path: ROUTES.recruitPosition("forward-deployed-engineer") },
+ *   ]} />
+ */
+
+const SITE_URL = Astro.site?.toString().replace(/\/$/, "") || "";
+
+interface BreadcrumbItem {
+  /** パンくずの表示名 */
+  name: string;
+  /** パス（例: "/recruit"）。指定するとサイト URL と結合して item URL を生成 */
+  path?: string;
+}
+
+const { items } = Astro.props as { items: BreadcrumbItem[] };
+
+const jsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": items.map((item: BreadcrumbItem, i: number) => ({
+    "@type": "ListItem",
+    "position": i + 1,
+    "name": item.name,
+    ...(item.path ? { "item": `${SITE_URL}${item.path}` } : {}),
+  })),
+});
+---
+
+<script is:inline type="application/ld+json" set:html={jsonLd} />

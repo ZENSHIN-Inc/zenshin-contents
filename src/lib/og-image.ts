@@ -9,11 +9,13 @@
  */
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import satori from "satori";
 import sharp from "sharp";
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+// Astro のプリレンダーはこのモジュールを dist/ 配下へ再配置するため、
+// import.meta.url 基準ではなく cwd（= リポジトリルートで実行される前提）で解決する。
+// scripts/build-slides.ts も冒頭で process.chdir(ROOT) しているので同じ前提が成り立つ
+const ROOT = process.cwd();
 
 const OG_WIDTH = 1200;
 const OG_HEIGHT = 630;
@@ -44,8 +46,8 @@ export interface OgOptions {
   label: string;
   /** 中央に表示するタイトル */
   title: string;
-  /** 左下に表示する著者情報 */
-  author: OgAuthor;
+  /** 左下に表示する著者情報（サイト全体 OGP など不要な場合は省略） */
+  author?: OgAuthor;
 }
 
 interface OgContext {
@@ -80,7 +82,68 @@ export async function renderOgImage({ label, title, author }: OgOptions): Promis
   contextPromise ??= loadContext();
   const { fonts, logoDataUri } = await contextPromise;
   // OGP 表示サイズは 88px。Retina 2x + sharp の SVG パース上限の余裕をみて 200px でクロップ
-  const authorImageDataUri = await toPngDataUri(author.imagePath, 200);
+  const authorImageDataUri = author ? await toPngDataUri(author.imagePath, 200) : null;
+
+  // 下段左の著者ブロック（author 未指定なら右ロゴと高さを揃える空枠）
+  const authorNode = author
+    ? {
+        type: "div",
+        props: {
+          style: { display: "flex", alignItems: "center", gap: "20px" },
+          children: [
+            {
+              type: "img",
+              props: {
+                src: authorImageDataUri,
+                width: 88,
+                height: 88,
+                style: {
+                  width: "88px",
+                  height: "88px",
+                  borderRadius: "9999px",
+                  objectFit: "cover",
+                  border: `3px solid ${COLOR.gold}`,
+                },
+              },
+            },
+            {
+              type: "div",
+              props: {
+                style: { display: "flex", flexDirection: "column", gap: "6px" },
+                children: [
+                  {
+                    type: "div",
+                    props: {
+                      style: {
+                        color: COLOR.foreground,
+                        fontSize: "30px",
+                        fontWeight: 700,
+                        letterSpacing: "0.02em",
+                        lineHeight: 1.1,
+                      },
+                      children: author.name,
+                    },
+                  },
+                  {
+                    type: "div",
+                    props: {
+                      style: {
+                        color: COLOR.muted,
+                        fontSize: "22px",
+                        fontWeight: 400,
+                        letterSpacing: "0.02em",
+                        lineHeight: 1.1,
+                      },
+                      children: author.role,
+                    },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      }
+    : { type: "div", props: { style: { flex: 1 } } };
 
   const svg = await satori(
     {
@@ -146,63 +209,7 @@ export async function renderOgImage({ label, title, author }: OgOptions): Promis
                   props: {
                     style: { display: "flex", alignItems: "center", justifyContent: "space-between" },
                     children: [
-                      {
-                        type: "div",
-                        props: {
-                          style: { display: "flex", alignItems: "center", gap: "20px" },
-                          children: [
-                            {
-                              type: "img",
-                              props: {
-                                src: authorImageDataUri,
-                                width: 88,
-                                height: 88,
-                                style: {
-                                  width: "88px",
-                                  height: "88px",
-                                  borderRadius: "9999px",
-                                  objectFit: "cover",
-                                  border: `3px solid ${COLOR.gold}`,
-                                },
-                              },
-                            },
-                            {
-                              type: "div",
-                              props: {
-                                style: { display: "flex", flexDirection: "column", gap: "6px" },
-                                children: [
-                                  {
-                                    type: "div",
-                                    props: {
-                                      style: {
-                                        color: COLOR.foreground,
-                                        fontSize: "30px",
-                                        fontWeight: 700,
-                                        letterSpacing: "0.02em",
-                                        lineHeight: 1.1,
-                                      },
-                                      children: author.name,
-                                    },
-                                  },
-                                  {
-                                    type: "div",
-                                    props: {
-                                      style: {
-                                        color: COLOR.muted,
-                                        fontSize: "22px",
-                                        fontWeight: 400,
-                                        letterSpacing: "0.02em",
-                                        lineHeight: 1.1,
-                                      },
-                                      children: author.role,
-                                    },
-                                  },
-                                ],
-                              },
-                            },
-                          ],
-                        },
-                      },
+                      authorNode,
                       {
                         type: "img",
                         props: { src: logoDataUri, width: 240, style: { display: "flex" } },

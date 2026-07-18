@@ -1,20 +1,33 @@
-# zenshin-contents
+# zenshin-contents — ZENSHIN Tech
 
-ZENSHIN のスライド・CG などを公開するコンテンツハブ（Marp + GitHub Pages）
+株式会社ZENSHINの技術メディア **ZENSHIN Tech**（技術ブログ + スライド + ギャラリー）。
+Astro 7 製の静的サイトで、Marp スライドのビルドパイプラインを内蔵しています。
 
 - **公開 URL**: https://contents.zenshin-inc.co.jp/
   - DNS（CNAME）は zenshin-infra の Terraform で管理
-- main に push すると GitHub Actions が自動でビルドして公開します（完全 CLI 運用）
+- main に push すると GitHub Actions がビルドして Cloudflare Pages へデプロイします（完全 CLI 運用・**push = 即公開**）
+- 技術ブログは zenshin-hp（www.zenshin-inc.co.jp）から 2026-07 に移設。旧 `/blog/*` URL は HP 側で 301 リダイレクト
 
 ## ディレクトリ構成
 
 ```
-slides/    Marp 原稿（1 ファイル = 1 デッキ、YYYY-MM-DD-<slug>.md）
-gallery/   CG・生成画像などの公開素材（<YYYYMM>-<slug>/ で分ける）
-assets/    ブランド素材（ロゴ・favicon・著者アバター。zenshin-hp 由来）
-themes/    Marp カスタムテーマ（zenshin.css）
-scripts/   ビルドスクリプト（TypeScript / Bun 実行）
-dist/      ビルド成果物（git 管理外、CI が生成）
+src/
+  content/blog/     ブログ記事（YYYY-MM-DD-<slug>.md、frontmatter は content.config.ts の Zod スキーマ）
+  content/authors/  著者（zenshin-hp の members のサブセット）
+  pages/            トップ（ブログ+スライド混在一覧）/blog /slides /gallery /og /index.json /rss.xml
+  components/       Header / Footer / ArticleCard など（zenshin-hp から移植）
+  layouts/          BaseLayout（SEO・OGP・JSON-LD）/ PageLayout
+  lib/og-image.ts   OGP 画像レンダラー（satori + sharp。ブログ・スライド共用）
+  plugins/          satteri リンクカード（zenshin-hp から移植）
+  data/             build-slides.ts の生成物（slides.json / gallery.json、git 管理外）
+slides/     Marp 原稿（1 ファイル = 1 デッキ、YYYY-MM-DD-<slug>.md）
+gallery/    CG・生成画像などの公開素材（<YYYYMM>-<slug>/ で分ける）
+assets/     ブランド素材とスライド用引用図版（public/assets へコピーされる）
+themes/     Marp カスタムテーマ（zenshin.css）
+scripts/    build-slides.ts（Marp prebuild）/ check-overflow.ts / sync-agent-docs.ts
+public/     静的ファイル。slides/ assets/ gallery/ は build-slides.ts の生成物（git 管理外）、
+            link-cards/ はリンクカードの画像キャッシュ（コミットする）
+dist/       ビルド成果物（git 管理外、CI が生成）
 ```
 
 ## セットアップ
@@ -25,6 +38,35 @@ dist/      ビルド成果物（git 管理外、CI が生成）
 mise install
 bun install
 ```
+
+## ビルド・確認
+
+```bash
+bun run dev        # スライド prebuild + astro dev（ドラフト記事も表示される）
+bun run build      # 本番同等ビルド（スライド prebuild + astro build → dist/）
+bun run ci         # スキル同期チェック + build + typecheck + はみ出し検知（CI と同等）
+bun run check      # スライドのはみ出し自動検知のみ
+bun run dev:marp   # Marp のライブプレビューだけ欲しいとき
+```
+
+## ブログ記事の追加手順
+
+1. `src/content/blog/YYYY-MM-DD-<slug>.md` を作成
+
+   ```markdown
+   ---
+   title: 記事タイトル（OGP 2 行制約で最大 40 文字）
+   date: 2026-07-17
+   tags: [Web, Astro]        # 1〜6 個
+   description: 一覧・OGP に出る説明文
+   slug: my-article          # URL は /blog/<slug>/
+   author: 05-takahashi      # src/content/authors/ の ID
+   ---
+   ```
+
+2. 本文中に URL だけの段落（`[https://…](https://…)`）を書くと、ビルド時に OGP を取得してリンクカードに変換される
+3. `published: false` でドラフト（`astro dev` でのみ表示、ビルドから除外）
+4. main に push すると公開。OGP 画像（著者アイコン入り 1200x630）は自動生成される
 
 ## スライドの追加手順
 
@@ -44,47 +86,31 @@ bun install
 2. main に push すると、数分で公開 URL に反映される
    - HTML: `/slides/<ファイル名>.html`
    - PDF: `/slides/<ファイル名>.pdf`（Docswell などへのアップロード・配布用）
-   - OGP 画像: `/slides/<ファイル名>-og.png`（zenshin-hp の技術ブログと同じ意匠で自動生成）
-   - トップページの一覧にも自動で載る
-
-## zenshin-hp との連携（dist/index.json）
-
-ビルド時にデッキメタデータのフィード `dist/index.json` を生成する。
-zenshin-hp が Astro Content Layer のローダーからビルド時に fetch し、
-技術ブログの記事とスライドを同じ一覧ページに並べるためのデータソース。
-
-- スキーマ: `version` / `site` / `generatedAt` / `decks[]`（`slug` / `title` / `description` / `date` / `author` / `urls.{page,pdf,thumbnail,ogImage}`）
-- `author` は zenshin-hp の members コレクションの ID（HP 側で氏名・顔写真を解決する）
-- **スキーマを変える場合は zenshin-hp 側のローダーと合わせて `version` を上げる**
-- OGP 画像の意匠（ゴールド枠 + ネイビー + 著者アイコン）は zenshin-hp の `src/lib/og-image.ts` から `scripts/og-image.ts` に移植したもの。HP 側のデザインが変わったら追従する
-
-## ローカルプレビュー
-
-```bash
-# ライブプレビュー（http://localhost:8080 で slides/ を一覧表示）
-bun run dev
-
-# 本番同等ビルド（dist/ に HTML + PDF + 一覧ページを生成）
-bun run build
-open dist/index.html
-
-# 型チェック + ビルド（CI と同等）
-bun run ci
-```
-
-VS Code の場合は [Marp for VS Code](https://marketplace.visualstudio.com/items?itemName=marp-team.marp-vscode) 拡張でもプレビューできます（`themes/zenshin.css` を `markdown.marp.themes` に登録）。
+   - OGP 画像: `/slides/<ファイル名>-og.png`（ブログと同じ意匠で自動生成）
+   - トップページ・`/slides/` の一覧にも自動で載る
 
 ## gallery/ への画像追加
 
 `gallery/<YYYYMM>-<slug>/` にフォルダを切って画像を置き、push するだけで公開されます。
 命名規則・サイズの目安は [gallery/README.md](gallery/README.md) を参照。
 
+## フィード（/index.json・/rss.xml）
+
+- `/index.json` — デッキ（`decks`）とブログ記事（`posts`）のメタデータフィード。
+  zenshin-hp が Content Layer のローダーからビルド時に fetch する。
+  **decks のスキーマ（v1）を変える場合は zenshin-hp 側のローダーと合わせて `version` を上げる**
+- `/rss.xml` — ブログ + スライドの RSS
+
+## zenshin-hp との関係
+
+- 本サイト = 技術メディア（ZENSHIN Tech）、zenshin-hp = コーポレートサイト
+- ブランド意匠（カラートークン・OGP デザイン・コンポーネント）は zenshin-hp 由来。
+  HP 側のデザイン変更時は `src/styles/global.css` / `src/lib/og-image.ts` を追従させる
+- リンクカードのキャッシュ更新: `bun run link-cards:refresh`
+
 ## スライド共有サービスへの展開（Docswell / Speaker Deck）
 
-- 主軸は本リポジトリの GitHub Pages。全デッキをここで公開する
-- **対外発信したい代表作のみ**、ビルド済み PDF を手動アップロードする
-  - 第一候補: [Docswell](https://www.docswell.com/)（日本語 SEO が強く、非エンジニア層にも届く）
-  - 補助: [Speaker Deck](https://speakerdeck.com/)（エンジニア向け。無料枠は 1 日 10 件・累計 100 件）
-  - SlideShare は広告過多のため使わない
-- どちらもアップロード API / CLI がないため Web 画面から手動で行う（頻度が上がったらブラウザ自動操作による半自動化を検討）
-- アップロードする PDF は `bun run build` で生成される `dist/slides/*.pdf` を使う
+- 主軸は本サイト。全デッキをここで公開する
+- **対外発信したい代表作のみ**、ビルド済み PDF（`dist/slides/*.pdf`）を手動アップロードする
+  - 第一候補: [Docswell](https://www.docswell.com/)（日本語 SEO が強い）
+  - 補助: [Speaker Deck](https://speakerdeck.com/)（エンジニア向け）

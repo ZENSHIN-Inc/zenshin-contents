@@ -1,0 +1,65 @@
+---
+/**
+ * 関連記事ブロック
+ *
+ * 現在の記事と同じタグを持つ他記事を、タグの一致数が多い順・次に新しい順で並べて上位 N 件表示する。
+ * 0 件（他の記事が存在しないなど）の場合は何もレンダリングしない。
+ */
+import { getCollection } from "astro:content";
+import ArticleCard from "./ArticleCard.astro";
+import { ROUTES } from "@/consts/routes";
+import { filterPublished } from "@/lib/drafts";
+
+interface Props {
+  currentSlug: string;
+  tags: string[];
+  limit?: number;
+  class?: string;
+}
+
+const { currentSlug, tags, limit = 3, class: className = "" } = Astro.props;
+
+const allPosts = filterPublished(await getCollection("blog"));
+
+const related = allPosts
+  .filter((p) => p.data.slug !== currentSlug)
+  .map((p) => ({
+    post: p,
+    matchCount: p.data.tags.filter((t) => tags.includes(t)).length,
+  }))
+  .filter((x) => x.matchCount > 0)
+  .sort((a, b) => {
+    if (a.matchCount !== b.matchCount) return b.matchCount - a.matchCount;
+    return (
+      new Date(b.post.data.date).getTime() -
+      new Date(a.post.data.date).getTime()
+    );
+  })
+  .slice(0, limit)
+  .map((x) => x.post);
+---
+
+{related.length > 0 && (
+  <section class:list={[className]} aria-labelledby="related-heading">
+    <h2
+      id="related-heading"
+      class="mb-5 text-base font-bold text-primary md:text-lg"
+    >
+      関連記事
+    </h2>
+    <ul class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+      {related.map((post, i) => (
+        <ArticleCard
+          href={ROUTES.blogPost(post.data.slug)}
+          ogImageSrc={ROUTES.ogImageBlog(post.data.slug)}
+          title={post.data.title}
+          tags={post.data.tags}
+          date={post.data.date}
+          linkable
+          delay={String(Math.min(i + 1, 3))}
+          isDraft={!post.data.published}
+        />
+      ))}
+    </ul>
+  </section>
+)}

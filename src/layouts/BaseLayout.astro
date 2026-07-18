@@ -1,0 +1,167 @@
+---
+/**
+ * 全ページ共通のベースレイアウト（zenshin-hp から移植し ZENSHIN Tech 用に調整）
+ * SEO メタデータ、OGP、JSON-LD、フォント、グローバルスタイルを管理
+ */
+
+// セルフホスティングフォント（Google Fonts CDN 不要）
+// ※ frontmatter import でないと Vite がフォントファイルをバンドルしない
+// 本文は OS 標準フォント（system-ui）を使うため、装飾英字用の Inter のみ読み込む
+// @ts-ignore - CSS パッケージのため型定義なし（ビルド・動作に問題なし）
+import "@fontsource-variable/inter";
+// グローバルスタイル — 必ず frontmatter の ES import で読み込む
+// （astro.config.ts の build.inlineStylesheets: "always" と併せて全 CSS を HTML にインライン化）
+import "../styles/global.css";
+import { ROUTES } from "@/consts/routes";
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+  ogType?: string;
+  noindex?: boolean;
+}
+
+const { title, description, ogImage, ogType = "website", noindex = false } = Astro.props;
+const siteUrl = Astro.site?.toString().replace(/\/$/, "") || "";
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const ogImagePath = ogImage || ROUTES.ogImageSite;
+const ogImageURL = new URL(ogImagePath, Astro.site).href;
+const ogImageType = ogImagePath.endsWith(".png")
+  ? "image/png"
+  : ogImagePath.endsWith(".jpg") || ogImagePath.endsWith(".jpeg")
+    ? "image/jpeg"
+    : "image/webp";
+
+// ローカル開発を favicon / タイトル / バッジで見分ける（本番は GitHub Pages のカスタムドメインのみ）
+const envRules = [
+  { match: "localhost", label: "LOCAL", color: "#15803d" },
+  { match: "127.0.0.1", label: "LOCAL", color: "#15803d" },
+];
+---
+
+<!doctype html>
+<!-- bg-surface-dark: オーバースクロール時にヘッダー（上）・フッター（下）と連続するダーク背景を表示 -->
+<html lang="ja" class="light bg-surface-dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+    <!-- SEO -->
+    <title>{title}</title>
+
+    <!-- ローカル環境判定 — hostname を見て title / favicon / バッジを切り替える -->
+    <script is:inline define:vars={{ envRules }}>
+      (function () {
+        var host = window.location.hostname;
+        var env = envRules.find(function (r) { return host === r.match; });
+        if (!env) return;
+
+        document.title = "[" + env.label + "] " + document.title;
+
+        var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">' +
+          '<rect width="32" height="32" rx="6" fill="' + env.color + '"/>' +
+          '<text x="16" y="23" font-size="20" font-weight="bold" ' +
+          'font-family="system-ui,sans-serif" fill="white" text-anchor="middle">Z</text></svg>';
+        var icon = document.querySelector('link[rel="icon"]');
+        if (icon) {
+          icon.setAttribute("href", "data:image/svg+xml," + encodeURIComponent(svg));
+          icon.setAttribute("type", "image/svg+xml");
+        }
+
+        function showBadge() {
+          var b = document.createElement("div");
+          b.setAttribute("aria-hidden", "true");
+          b.style.cssText = "position:fixed;bottom:16px;right:16px;z-index:100;" +
+            "border-radius:9999px;padding:4px 12px;font-size:12px;font-weight:700;" +
+            "color:white;pointer-events:none;user-select:none;" +
+            "box-shadow:0 4px 6px rgba(0,0,0,.1);font-family:system-ui,sans-serif;" +
+            "background-color:" + env.color;
+          b.textContent = env.label;
+          document.body.appendChild(b);
+        }
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", showBadge);
+        } else {
+          showBadge();
+        }
+      })();
+    </script>
+
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+    {noindex && <meta name="robots" content="noindex" />}
+
+    <!-- OGP -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:site_name" content="ZENSHIN Tech" />
+    <meta property="og:locale" content="ja_JP" />
+    <meta property="og:image" content={ogImageURL} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content={ogImageType} />
+    <meta property="og:image:alt" content={title} />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL} />
+
+    <!-- RSS -->
+    <link rel="alternate" type="application/rss+xml" title="ZENSHIN Tech" href={ROUTES.rss} />
+
+    <!-- テーマカラー（ブラウザUI / モバイルステータスバー）— ダークヘッダーに合わせる -->
+    <meta name="theme-color" content="#0c1220" />
+
+    <!-- JSON-LD 構造化データ — 技術メディアとしての WebSite + 運営元 Organization -->
+    <script is:inline type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": `${siteUrl}/#website`,
+      "name": "ZENSHIN Tech",
+      "url": `${siteUrl}${ROUTES.home}`,
+      "description": "株式会社ZENSHINの技術メディア。技術ブログ・スライド・ギャラリーを公開しています。",
+      "inLanguage": "ja",
+      "publisher": {
+        "@type": "Organization",
+        "name": "株式会社ZENSHIN",
+        "url": ROUTES.corporate,
+        "logo": {
+          "@type": "ImageObject",
+          "url": `${siteUrl}/assets/brand/ZENSHIN-icon-square.webp`,
+        },
+      },
+    })} />
+  </head>
+  <body class="flex min-h-screen flex-col bg-surface text-on-surface font-sans antialiased">
+    <!-- スキップリンク — キーボードユーザーがナビゲーションをスキップしてメインコンテンツへ移動できる -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-100 focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:text-white focus:outline-none">
+      メインコンテンツへスキップ
+    </a>
+    <slot />
+
+    <!-- スクロールアニメーション用 IntersectionObserver -->
+    <script is:inline>
+      // モバイルで :active を初回タップから発火させる（空リスナー登録で UA に通知）
+      document.addEventListener('touchstart', function(){}, {passive: true});
+      (function() {
+        var observer = new IntersectionObserver(function(entries) {
+          entries.forEach(function(e) {
+            if (e.isIntersecting) {
+              e.target.classList.add('is-visible');
+              observer.unobserve(e.target);
+            }
+          });
+        }, { threshold: 0.15 });
+        document.querySelectorAll('[data-animate]').forEach(function(el) {
+          observer.observe(el);
+        });
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,71 @@
+---
+/**
+ * 記事の著者カード
+ *
+ * 詳細ページ末尾に表示する Zenn 風のコンパクトな著者ブロック。
+ * 画像は `src/assets/images/authors/` 配下にある想定で `import.meta.glob` で動的解決する。
+ */
+import { getEntry } from "astro:content";
+import { Image } from "astro:assets";
+
+interface Props {
+  authorId: string;
+  class?: string;
+}
+
+const { authorId, class: className = "" } = Astro.props;
+
+const member = await getEntry("authors", authorId);
+if (!member) throw new Error(`Author not found: ${authorId}`);
+
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  "../assets/images/authors/*.{jpg,jpeg,png,webp,avif}"
+);
+// ブログ著者用画像は blogImage を優先し、無ければ通常の image にフォールバック
+const authorImage = member.data.blogImage ?? member.data.image;
+const imageKey = `../assets/images/authors/${authorImage}`;
+const imageLoader = images[imageKey];
+if (!imageLoader) {
+  throw new Error(
+    `Author image not found in src/assets/images/authors/: ${authorImage}`
+  );
+}
+const imageMeta = (await imageLoader()).default;
+---
+
+<div class:list={["flex items-center gap-4", className]}>
+  <Image
+    src={imageMeta}
+    alt={member.data.name}
+    width={112}
+    height={112}
+    class="h-14 w-14 shrink-0 rounded-full object-cover ring-2 ring-border"
+  />
+  <div class="min-w-0">
+    <p class="text-xs font-medium text-muted-light">Author</p>
+    <div class="mt-0.5 flex items-center gap-2">
+      <p class="text-sm font-bold text-primary">{member.data.name}</p>
+      {
+        member.data.x && (
+          <a
+            href={member.data.x}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`${member.data.name} の X (旧 Twitter)`}
+            class="shrink-0 text-muted-light transition-colors hover:text-primary"
+          >
+            <svg
+              class="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+          </a>
+        )
+      }
+    </div>
+    <p class="text-xs text-muted-light">{member.data.role}</p>
+  </div>
+</div>

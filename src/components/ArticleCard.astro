@@ -1,0 +1,172 @@
+---
+/**
+ * ブログ / ニュース / スライド一覧のカード
+ *
+ * 1 枚あたりの構成:
+ *   [OGP サムネ]
+ *   タイトル（1 行 truncate）
+ *   [タイプバッジ]（blog / slides 混在一覧のみ）[タグ]（blog は複数、news は単一、slides はなし）
+ *   2026.04.17（末尾に mt-auto で下端揃え）… [PDF]（slides のみ）
+ *
+ * カード全体のタップ領域は、タイトル <a> に張った stretched-link（`::before` で全面を覆う）で
+ * 確保する。タグは `relative z-20` で前面に出し、独立したリンクとして動作させる。
+ * これにより「カード本体 → 記事詳細」「タグ → タグ別一覧」の 2 つを HTML 的に入れ子にせず両立できる。
+ *
+ * <li> も内包する前提で、親側は <ul class="grid ..."> の中でこのコンポーネントを
+ * そのまま並べる。`delay` は data-animate のフェードアップアニメ遅延用。
+ */
+import { Icon } from "astro-icon/components";
+import { ROUTES } from "@/consts/routes";
+
+interface Props {
+  href: string;
+  ogImageSrc: string;
+  title: string;
+  /** タグ。slides はタグを持たないため省略可 */
+  tags?: string[];
+  date: Date;
+  /**
+   * コンテンツ種別バッジ。「記事 / スライド」が混在する一覧（/blog/）で
+   * 種別を見分けるために表示する。news 一覧など単一種別の一覧では省略
+   */
+  contentType?: "article" | "slide";
+  /**
+   * 外部サイト（contents サブドメイン等）へのリンクとして開く。
+   * target="_blank" + タイトル横に外部リンクアイコンを付ける
+   */
+  external?: boolean;
+  /** PDF 版への副リンク（スライドカード用）。日付行の右端に表示 */
+  pdfHref?: string;
+  /**
+   * タグをタグ別一覧（/blog/tags/[tag]/）へのリンクにするか。
+   * news は現状タグページを持たないため false で呼び出す。
+   */
+  linkable?: boolean;
+  /** data-delay 用。スクロールインで順番に表示する時の遅延インデックス */
+  delay?: string;
+  /**
+   * true の場合、OGP サムネ左上に DRAFT バッジを重ねる。
+   * `published: false` の記事を staging で確認するときに使う。
+   */
+  isDraft?: boolean;
+}
+
+const {
+  href,
+  ogImageSrc,
+  title,
+  tags = [],
+  date,
+  contentType,
+  external = false,
+  pdfHref,
+  linkable = false,
+  delay,
+  isDraft = false,
+} = Astro.props;
+
+/** タイプバッジの表示定義（タグのゴールドと区別する紺系） */
+const CONTENT_TYPE_BADGE = {
+  article: { label: "記事", icon: "heroicons:document-text-20-solid" },
+  slide: { label: "スライド", icon: "heroicons:presentation-chart-bar-20-solid" },
+} as const;
+const badge = contentType ? CONTENT_TYPE_BADGE[contentType] : undefined;
+
+/** 日付を YYYY.MM.DD 形式にフォーマット */
+function formatDate(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}.${m}.${d}`;
+}
+---
+
+<li data-animate data-delay={delay}>
+  <article
+    class="article-card group relative flex h-full flex-col gap-4 transition-[transform,opacity] duration-150"
+  >
+    <div class="relative">
+      <img
+        src={ogImageSrc}
+        alt=""
+        width="1200"
+        height="630"
+        loading="lazy"
+        decoding="async"
+        class="strength-image aspect-1200/630 w-full object-cover"
+      />
+      {isDraft && (
+        <span
+          class="absolute left-2 top-2 z-10 inline-flex items-center rounded-sm bg-warning px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-surface-dark shadow"
+          aria-label="下書き記事"
+        >
+          Draft
+        </span>
+      )}
+    </div>
+    <div class="flex flex-1 flex-col gap-2">
+      <h3
+        class="text-base font-bold leading-snug text-primary transition-colors group-hover:text-accent md:text-lg"
+      >
+        <a
+          href={href}
+          target={external ? "_blank" : undefined}
+          rel={external ? "noopener noreferrer" : undefined}
+          class="flex items-center before:absolute before:inset-0 before:z-0 before:content-[''] focus-visible:outline-none focus-visible:before:ring-2 focus-visible:before:ring-accent focus-visible:before:ring-offset-2 focus-visible:before:rounded-2xl"
+        >
+          {/* タイトルが truncate されても外部リンクアイコンが隠れないよう flex で分離 */}
+          <span class="truncate">{title}</span>
+          {external && (
+            <Icon
+              name="heroicons:arrow-top-right-on-square-20-solid"
+              class="ml-1 h-4 w-4 shrink-0 opacity-60"
+              aria-hidden="true"
+            />
+          )}
+          {external && <span class="sr-only">（新しいタブで開く）</span>}
+        </a>
+      </h3>
+      <div class="relative z-20 flex flex-wrap gap-1.5">
+        {badge && (
+          <span class="inline-flex shrink-0 items-center gap-0.5 rounded-sm bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary">
+            <Icon name={badge.icon} class="h-3 w-3 opacity-70" />
+            {badge.label}
+          </span>
+        )}
+        {
+          tags.map((tag) =>
+            linkable ? (
+              <a
+                href={ROUTES.blogTag(tag)}
+                class="article-card-subnav-link inline-flex shrink-0 items-center gap-0.5 rounded-sm bg-label/10 px-2 py-0.5 text-xs font-bold text-label transition-[background-color,transform,opacity] hover:bg-label/20 active:scale-95 active:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              >
+                <Icon name="heroicons:hashtag-20-solid" class="h-3 w-3 opacity-70" />
+                {tag}
+              </a>
+            ) : (
+              <span class="inline-flex shrink-0 rounded-sm bg-label/10 px-2 py-0.5 text-xs font-bold text-label">
+                {tag}
+              </span>
+            )
+          )
+        }
+      </div>
+      <div class="mt-auto flex items-center gap-3 pt-1 text-xs text-muted-light">
+        <time class="tabular-nums" datetime={date.toISOString()}>
+          {formatDate(date)}
+        </time>
+        {pdfHref && (
+          <a
+            href={pdfHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="article-card-subnav-link relative z-20 ml-auto inline-flex items-center gap-0.5 font-bold text-label transition-[transform,opacity] hover:underline active:scale-95 active:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            <Icon name="heroicons:document-arrow-down-20-solid" class="h-3.5 w-3.5 opacity-70" aria-hidden="true" />
+            PDF<span class="sr-only">版を新しいタブで開く</span>
+          </a>
+        )}
+      </div>
+    </div>
+  </article>
+</li>

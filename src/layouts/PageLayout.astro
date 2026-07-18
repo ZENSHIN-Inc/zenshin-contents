@@ -1,0 +1,63 @@
+---
+/**
+ * 下層ページ共通レイアウト
+ * Header + ページタイトル帯 + コンテンツ + Footer
+ */
+import BaseLayout from "./BaseLayout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import BreadcrumbJsonLd from "@/components/BreadcrumbJsonLd.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import { ROUTES } from "@/consts/routes";
+
+interface BreadcrumbItem {
+  name: string;
+  path?: string;
+}
+
+interface Props {
+  title: string;
+  description: string;
+  pageTitle: string;
+  ogImage?: string;
+  ogType?: string;
+  noindex?: boolean;
+  /** カスタムパンくず（指定時はデフォルトの2階層パンくずを上書き） */
+  breadcrumbs?: BreadcrumbItem[];
+  /** タイトル帯の最大幅クラス（デフォルト: コンテンツ幅に合わせた max-w-4xl） */
+  headerMaxWidth?: string;
+}
+
+const { title, description, pageTitle, ogImage, ogType, noindex, breadcrumbs, headerMaxWidth = "max-w-4xl" } = Astro.props;
+
+// パンくずリスト: カスタム指定があればそれを使い、なければデフォルト2階層
+const breadcrumbItems = breadcrumbs ?? [
+  { name: "ホーム", path: ROUTES.home },
+  { name: pageTitle, path: Astro.url.pathname },
+];
+---
+
+<BaseLayout title={title} description={description} ogImage={ogImage} ogType={ogType} noindex={noindex}>
+  <BreadcrumbJsonLd items={breadcrumbItems} />
+  <Header />
+
+  <!-- ページタイトル帯 — パンくず + タイトル (+ 任意のメタ情報スロット) -->
+  <section class="bg-surface-dark pt-28 pb-10">
+    <div class={`mx-auto ${headerMaxWidth} px-6 lg:px-8`}>
+      <Breadcrumbs items={breadcrumbItems} class="mb-3" />
+      <h1 class="text-2xl font-bold text-on-surface-dark md:text-3xl lg:text-4xl">
+        {pageTitle}
+      </h1>
+      {/* h1 の下に件数・日付などの小さなメタ情報を差し込むスロット。
+          呼び出し側で指定がなければ何もレンダリングされない */}
+      <slot name="pageMeta" />
+    </div>
+  </section>
+
+  <!-- コンテンツ — flex-grow でフッターを画面下部に押し付ける（コンテンツが少ないページ対策） -->
+  <main id="main-content" class="flex-1 bg-surface">
+    <slot />
+  </main>
+
+  <Footer />
+</BaseLayout>

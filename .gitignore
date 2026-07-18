@@ -1,3 +1,12 @@
 node_modules/
 dist/
 .DS_Store
+
+# Astro
+.astro/
+
+# scripts/build-slides.ts の生成物
+public/slides/
+public/assets/
+public/gallery/
+src/data/

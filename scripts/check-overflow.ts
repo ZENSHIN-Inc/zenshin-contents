@@ -37,8 +37,9 @@ interface LayoutIssue {
   detail: string;
 }
 
+// index.html は Astro が生成するスライド一覧ページ（/slides/）なので対象外
 const htmlFiles = fs.existsSync(SLIDES_DIR)
-  ? fs.readdirSync(SLIDES_DIR).filter((f) => f.endsWith(".html")).sort()
+  ? fs.readdirSync(SLIDES_DIR).filter((f) => f.endsWith(".html") && f !== "index.html").sort()
   : [];
 
 if (htmlFiles.length === 0) {

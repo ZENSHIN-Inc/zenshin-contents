@@ -1,18 +1,10 @@
 {
-  // scripts/ 配下（Bun ランタイムで実行するビルドスクリプト）用の型検査設定。
-  // 型検査は package.json の typecheck（tsc --noEmit）。
+  "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
-    "target": "ESNext",
-    "lib": ["ESNext"],
-    "module": "Preserve",
-    "moduleResolution": "bundler",
-    "moduleDetection": "force",
-    "types": ["bun"],
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "verbatimModuleSyntax": true,
-    "skipLibCheck": true,
-    "noEmit": true
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "types": ["bun"]
   },
-  "include": ["scripts/**/*.ts"]
+  "include": ["src/**/*", "scripts/**/*", "astro.config.ts"]
 }

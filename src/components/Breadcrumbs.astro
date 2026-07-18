@@ -1,0 +1,56 @@
+---
+/**
+ * 視覚的なパンくずリスト
+ *
+ * 構造化データ側は `BreadcrumbJsonLd.astro` にあり、本コンポーネントは HTML 表示専用。
+ * 両者とも `items: { name, path? }[]` の同じ props 形状を受け取るので、同じ配列を共有できる。
+ *
+ * 使用例:
+ *   import { ROUTES } from "@/consts/routes";
+ *   <Breadcrumbs items={[
+ *     { name: "ホーム", path: ROUTES.home },
+ *     { name: "技術ブログ", path: ROUTES.blog },
+ *     { name: post.data.title },
+ *   ]} />
+ */
+import { Icon } from "astro-icon/components";
+
+interface BreadcrumbItem {
+  name: string;
+  path?: string;
+}
+
+interface Props {
+  items: BreadcrumbItem[];
+  /** nav 要素に追加するクラス（mb-3 / mb-4 等の外側余白指定に利用） */
+  class?: string;
+}
+
+const { items, class: className = "" } = Astro.props;
+---
+
+<nav aria-label="パンくずリスト" class:list={["text-sm text-on-surface-dark/80", className]}>
+  <ol class="flex flex-wrap items-center gap-1">
+    {items.map((item, i) => (
+      <li class:list={["flex items-center gap-1", i === items.length - 1 && "min-w-0"]}>
+        {i > 0 && (
+          <Icon
+            name="heroicons:chevron-right-20-solid"
+            class="h-3.5 w-3.5 shrink-0 opacity-70"
+            aria-hidden="true"
+          />
+        )}
+        {i < items.length - 1 && item.path ? (
+          <a
+            href={item.path}
+            class="hover:text-on-surface-dark transition-all active:opacity-70 active:scale-95"
+          >
+            {item.name}
+          </a>
+        ) : (
+          <span class="truncate" aria-current="page">{item.name}</span>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>

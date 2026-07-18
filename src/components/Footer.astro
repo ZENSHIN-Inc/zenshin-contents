@@ -1,0 +1,71 @@
+---
+/**
+ * フッター（ZENSHIN Tech）— ダーク背景、ロゴ + サイトマップ + コピーライト
+ */
+import { ROUTES } from "@/consts/routes";
+
+const linkGroups = [
+  {
+    heading: "コンテンツ",
+    links: [
+      { label: "ブログ", href: ROUTES.blog, external: false },
+      { label: "スライド", href: ROUTES.slides, external: false },
+      { label: "ギャラリー", href: ROUTES.gallery, external: false },
+      { label: "RSS", href: ROUTES.rss, external: false },
+    ],
+  },
+  {
+    heading: "株式会社ZENSHIN",
+    links: [
+      { label: "会社サイト", href: ROUTES.corporate, external: true },
+      { label: "お問い合わせ", href: ROUTES.corporateContact, external: true },
+      { label: "X (@zenshin_inc)", href: "https://x.com/zenshin_inc", external: true },
+    ],
+  },
+];
+---
+
+<footer class="bg-surface-dark">
+  <div class="mx-auto max-w-6xl px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-[1.5fr_1fr_1fr] md:gap-8">
+      <!-- ロゴ + 説明 -->
+      <div class="order-last col-span-2 max-w-xs md:order-none md:col-span-1">
+        <a href={ROUTES.home} class="inline-flex items-baseline gap-2 active:opacity-70 active:scale-95">
+          <img src="/assets/brand/ZENSHIN-logo-white.webp" alt="ZENSHIN Tech - ホームに戻る" width="120" height="28" class="h-6 w-auto" loading="lazy" />
+          <span class="font-display text-base font-bold tracking-wide text-label">Tech</span>
+        </a>
+        <p class="mt-4 text-sm leading-relaxed text-white/80">
+          株式会社ZENSHINの技術メディア。<br />技術ブログ・スライド・ギャラリーを公開しています。
+        </p>
+      </div>
+
+      <!-- カテゴリ別リンク -->
+      {linkGroups.map((group) => (
+        <nav aria-label={group.heading}>
+          <p class="text-xs font-bold tracking-wider text-white/45">{group.heading}</p>
+          <ul class="mt-3 space-y-2.5 md:mt-4 md:space-y-3">
+            {group.links.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  target={link.external ? "_blank" : undefined}
+                  rel={link.external ? "noopener noreferrer" : undefined}
+                  class="text-sm text-white/80 transition-colors hover:text-white active:opacity-70 active:scale-95"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ))}
+    </div>
+  </div>
+
+  <!-- コピーライト -->
+  <div class="border-t border-white/5 py-6">
+    <p class="text-center text-sm text-white/80">
+      &copy; {new Date().getFullYear()} 株式会社ZENSHIN. All rights reserved.
+    </p>
+  </div>
+</footer>
