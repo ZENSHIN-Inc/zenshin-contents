@@ -34,8 +34,9 @@ const DATA_DIR = path.join(ROOT, "src", "data");
 const SITE_ORIGIN = "https://tech.zenshin-inc.co.jp";
 const IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"]);
 
-// デッキの著者（現状は全デッキ共通）。src/content/authors/ のコレクション ID
-const AUTHOR_ID = "05-takahashi";
+// デッキの著者の既定値。デッキごとに frontmatter の `author:` で
+// src/content/authors/ のコレクション ID を指定して上書きできる
+const DEFAULT_AUTHOR_ID = "05-takahashi";
 
 // marp-cli は process.cwd() 基準でパスを解決する
 process.chdir(ROOT);
@@ -66,6 +67,14 @@ interface Deck {
   description: string;
   date: string;
   tags: string[];
+  /** src/content/authors/ のコレクション ID */
+  author: string;
+}
+
+interface Author {
+  name: string;
+  role: string;
+  imagePath: string;
 }
 
 /** `tags: [A, B]` のようなインライン配列表記をパースする（それ以外は空配列） */
@@ -132,8 +141,27 @@ const decks: Deck[] = slideFiles.map((file) => {
     description: fm["description"] ?? "",
     date: dateMatch ? `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}` : "",
     tags: parseTags(fm["tags"]),
+    author: fm["author"] ?? DEFAULT_AUTHOR_ID,
   };
 });
+
+/** src/content/authors/<id>.md の frontmatter から OGP 用の著者情報を読む */
+function loadAuthor(id: string): Author {
+  const authorPath = path.join(ROOT, "src", "content", "authors", `${id}.md`);
+  if (!fs.existsSync(authorPath)) {
+    throw new Error(`著者 ID "${id}" が src/content/authors/ に見つかりません`);
+  }
+  const fm = parseFrontMatter(fs.readFileSync(authorPath, "utf8"));
+  const image = fm["blogImage"] ?? fm["image"];
+  if (!fm["name"] || !fm["role"] || !image) {
+    throw new Error(`src/content/authors/${id}.md に name / role / image が必要です`);
+  }
+  return {
+    name: fm["name"],
+    role: fm["role"],
+    imagePath: path.join(ROOT, "src", "assets", "images", "authors", image),
+  };
+}
 
 // ---------------------------------------------------------------------------
 // 3. ビューワー連携スクリプト（HTML 版へ注入）
@@ -284,21 +312,26 @@ for (const deck of decks) {
     console.error(`slides/${deck.base}.md: tags は 5〜6 個必須です（現在 ${deck.tags.length} 個）`);
     process.exit(1);
   }
+  // 表紙の著者表記と frontmatter の author がずれていないかを検証する
+  const author = loadAuthor(deck.author);
+  const markdown = fs.readFileSync(path.join(SLIDES_DIR, `${deck.base}.md`), "utf8");
+  if (!markdown.includes(`cover-author">${author.name}`)) {
+    console.error(
+      `slides/${deck.base}.md: 表紙の cover-author が著者 "${deck.author}"（${author.name}）と一致しません。` +
+        `frontmatter の author と <div class="cover-author"> をそろえてください`,
+    );
+    process.exit(1);
+  }
 }
 
 if (decks.length > 0) {
   // OGP 画像（1200x630）をデッキごとに生成する。ブランド意匠は zenshin-hp の技術ブログ OGP と統一
   console.log("Building OG images...");
-  const author = {
-    name: "高橋 俊",
-    role: "CTO / 技術責任者",
-    imagePath: path.join(ROOT, "src", "assets", "images", "authors", "takahashi-old.jpg"),
-  };
   for (const deck of decks) {
     const png = await renderOgImage({
       label: "スライド資料 | 株式会社ZENSHIN",
       title: deck.title,
-      author,
+      author: loadAuthor(deck.author),
       date: deck.date ? deck.date.replaceAll("-", ".") : undefined,
     });
     fs.writeFileSync(path.join(PUBLIC, "slides", `${deck.base}-og.png`), png);
@@ -391,7 +424,7 @@ const slidesData = decks.map((d) => ({
   description: d.description,
   date: d.date,
   tags: d.tags,
-  author: AUTHOR_ID,
+  author: d.author,
   urls: {
     // page はビューワーページ（SpeakerDeck 風の額縁 + エンドカード）。
     // Marp が生成する素の HTML は /slides/<id>.html で、ビューワーが iframe で埋め込む

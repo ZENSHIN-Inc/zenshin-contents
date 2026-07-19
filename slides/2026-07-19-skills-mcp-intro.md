@@ -7,13 +7,14 @@ paginate: true
 title: スキルとMCP入門 — プロンプト頼みから仕組み化へ
 tags: [AI, MCP, スキル, ChatGPT, Claude, 業務効率化]
 description: ChatGPT・Claudeを使い始めた方向けに、「毎回結果がぶれる」「コピペ作業が残る」という悩みをスキルとMCPで解決する考え方を解説します。どちらを選ぶかの判断基準と、特定AIに依存しない共通規格である理由まで扱います。
+author: 05-takahashi
 footer: © ZENSHIN Inc.
 ---
 
 <!-- _class: lead cover -->
 <!-- _paginate: false -->
 
-<div class="cover-kicker">スライド | 株式会社ZENSHIN</div>
+<div class="cover-kicker">スライド資料 | 株式会社ZENSHIN</div>
 
 # スキルとMCP入門
 

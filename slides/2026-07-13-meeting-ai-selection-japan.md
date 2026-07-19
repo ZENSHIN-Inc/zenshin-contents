@@ -7,13 +7,14 @@ paginate: true
 title: 日本企業のための会議AI・議事録基盤の選び方
 tags: [AI, 会議AI, 議事録, SaaS, 技術選定]
 description: 2026年7月現在、日本企業が会議AIを選ぶ際の結論を用途別に整理します。Teams、Google Meet、Zoom、Slack Huddle、対面が混在する場合の独立系会議AIも比較します。
+author: 05-takahashi
 footer: © ZENSHIN Inc.
 ---
 
 <!-- _class: lead cover -->
 <!-- _paginate: false -->
 
-<div class="cover-kicker">スライド | 株式会社ZENSHIN</div>
+<div class="cover-kicker">スライド資料 | 株式会社ZENSHIN</div>
 
 # 会議AI・議事録基盤の選び方
 
