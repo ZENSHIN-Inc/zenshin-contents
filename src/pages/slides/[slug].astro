@@ -146,6 +146,11 @@ const TYPE_LABEL = { article: "記事", slide: "スライド" } as const;
             allowfullscreen
           ></iframe>
 
+          {/* シアターモード中だけ最下部に出す進行度バー（下部バーが隠れる代わり） */}
+          <div class="deck-theater-progress" aria-hidden="true">
+            <div id="deck-theater-progress-fill"></div>
+          </div>
+
           {/* エンドカード — 最終ページでもう一度「次へ」を押すと表示される */}
           <div
             id="deck-endcard"
@@ -325,6 +330,26 @@ const TYPE_LABEL = { article: "記事", slide: "スライド" } as const;
   #deck-stage.deck-theater .deck-theater-exit {
     display: inline-flex;
   }
+  /* シアターモード中の進行度バー — 下部コントロールバーが画面外になるため、
+     stage 最下部に細いバーだけ重ねて現在位置がわかるようにする */
+  .deck-theater-progress {
+    display: none;
+  }
+  #deck-stage.deck-theater .deck-theater-progress {
+    display: block;
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 20;
+    height: 4px;
+    background: color-mix(in srgb, white 14%, transparent);
+  }
+  .deck-theater-progress > div {
+    height: 100%;
+    width: 0;
+    background: #c4a97d;
+    transition: width 0.2s;
+  }
 </style>
 
 <script>
@@ -340,6 +365,7 @@ const TYPE_LABEL = { article: "記事", slide: "スライド" } as const;
   const pageEl = document.getElementById("deck-page");
   const totalEl = document.getElementById("deck-total");
   const progressEl = document.getElementById("deck-progress");
+  const theaterProgressEl = document.getElementById("deck-theater-progress-fill");
   const seekEl = document.getElementById("deck-seek");
   const replayBtn = document.getElementById("deck-replay");
 
@@ -381,6 +407,7 @@ const TYPE_LABEL = { article: "記事", slide: "スライド" } as const;
       if (pageEl) pageEl.textContent = String(page);
       if (totalEl) totalEl.textContent = String(total);
       if (progressEl) progressEl.style.width = `${(page / total) * 100}%`;
+      if (theaterProgressEl) theaterProgressEl.style.width = `${(page / total) * 100}%`;
       if (seekEl) {
         seekEl.setAttribute("aria-valuemax", String(total));
         seekEl.setAttribute("aria-valuenow", String(page));
