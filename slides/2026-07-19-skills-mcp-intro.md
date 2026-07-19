@@ -214,7 +214,7 @@ footer: © ZENSHIN Inc.
 
 <p class="lead-in">MCPは、AIが外部のデータやシステムを直接読み書きするための接続規格です。</p>
 
-![w:940](../assets/slides/skills-mcp-intro/mcp-connection.svg)
+![w:1000](../assets/slides/skills-mcp-intro/mcp-connection.svg)
 
 <p class="note">USB-Cのように「共通の差し込み口」を決めた規格。対応サービスなら、どれも同じ方法でAIとつながる。</p>
 
