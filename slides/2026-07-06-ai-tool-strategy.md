@@ -516,7 +516,7 @@ Web ブラウザ版とは別物。***Web 版だけでは実力の半分も出な
 
 <div class="contact-links">
 
-<a href="https://www.zenshin-inc.co.jp/contact"><span>公式ホームページのお問い合わせ</span><strong>www.zenshin-inc.co.jp/contact</strong></a>
+<a href="https://www.zenshin-inc.co.jp/contact/?type=tech-blog"><span>公式ホームページのお問い合わせ</span><strong>www.zenshin-inc.co.jp/contact/?type=tech-blog</strong></a>
 <a href="https://x.com/suguru_takaha4"><span>ZENSHIN CTO 高橋 俊へのご質問</span><strong>X @suguru_takaha4</strong><small>DMまたはリプライ</small></a>
 
 </div>

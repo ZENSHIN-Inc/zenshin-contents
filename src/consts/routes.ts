@@ -10,7 +10,7 @@ export const ROUTES = {
 
   // 外部（コーポレートサイト）
   corporate: "https://www.zenshin-inc.co.jp/",
-  corporateContact: "https://www.zenshin-inc.co.jp/contact/",
+  corporateContact: "https://www.zenshin-inc.co.jp/contact/?type=tech-blog",
   corporatePrivacy: "https://www.zenshin-inc.co.jp/privacy/",
   operatorX: "https://x.com/suguru_takaha4",
 
