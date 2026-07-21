@@ -11,6 +11,8 @@ export const ROUTES = {
   // 外部（コーポレートサイト）
   corporate: "https://www.zenshin-inc.co.jp/",
   corporateContact: "https://www.zenshin-inc.co.jp/contact/",
+  corporatePrivacy: "https://www.zenshin-inc.co.jp/privacy/",
+  operatorX: "https://x.com/suguru_takaha4",
 
   // 動的ルート
   blogPost: (slug: string) => `/blog/${slug}/` as const,

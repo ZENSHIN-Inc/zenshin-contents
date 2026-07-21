@@ -9,6 +9,8 @@ name: Deploy to Cloudflare Pages
 #     - **Token と GitHub Actions Secret は zenshin-infra で Terraform 管理**
 #       (zenshin-infra/terraform/cloudflare/cloudflare-tokens.tf §O)。本リポでは手動編集禁止
 #   - CLOUDFLARE_ACCOUNT_ID は Org 変数（vars）を使用
+#   - SLACK_BOT_TOKEN
+#     - 新規コンテンツの公開通知用（chat:write）。投稿先: #94_zenshinホームページ
 on:
   push:
     branches: [main]
@@ -46,6 +48,14 @@ jobs:
       - name: Typecheck & Build
         run: bun run ci
 
+      # デプロイ前の公開フィードを保存し、今回のビルドとの差分から新規公開だけを判定する。
+      # 取得失敗時は誤通知を避けるため、デプロイは継続して通知だけをスキップする。
+      - name: 現在の公開コンテンツを取得
+        id: previous_feed
+        if: github.event_name != 'pull_request'
+        continue-on-error: true
+        run: curl --fail --silent --show-error --retry 3 --output "$RUNNER_TEMP/previous-index.json" https://tech.zenshin-inc.co.jp/index.json
+
       - name: Cloudflare Pages へデプロイ
         if: github.event_name != 'pull_request'
         uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
@@ -53,3 +63,12 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy dist --project-name=zenshin-tech --commit-dirty=true --branch=main
+
+      - name: 新規コンテンツを Slack に通知
+        if: github.event_name != 'pull_request' && steps.previous_feed.outcome == 'success'
+        continue-on-error: true
+        run: bun run .github/scripts/slack-notify-new-content.ts
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          PREVIOUS_FEED_PATH: ${{ runner.temp }}/previous-index.json
+          CURRENT_FEED_PATH: dist/index.json

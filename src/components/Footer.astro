@@ -7,20 +7,21 @@ import { Icon } from "astro-icon/components";
 import { ROUTES } from "@/consts/routes";
 
 // トップの種別チップと重複するため「ブログ / スライド」の個別リンクは置かない。
-// 「運営会社への導線」と「フォロー導線」で目的別に分ける
+// 「運営会社への導線」と「購読導線」で目的別に分ける
 const linkGroups = [
   {
     heading: "運営会社",
     links: [
       { label: "ホームページ", href: ROUTES.corporate, external: false },
       { label: "お問い合わせ", href: ROUTES.corporateContact, external: false },
+      { label: "プライバシーポリシー", href: ROUTES.corporatePrivacy, external: false },
     ],
   },
   {
-    heading: "フォローする",
+    heading: "購読する",
     links: [
-      { label: "X (@zenshin_inc)", href: "https://x.com/zenshin_inc", external: true },
       { label: "RSS", href: ROUTES.rss, external: false },
+      { label: "運用者 高橋 俊のX", href: ROUTES.operatorX, external: true },
     ],
   },
 ];
