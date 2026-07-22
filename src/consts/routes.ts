@@ -9,7 +9,19 @@ export const ROUTES = {
   rss: "/rss.xml",
 
   // 外部（コーポレートサイト）
+  // ヘッダー・フッターを zenshin-hp と同一ナビ構成にしているため、
+  // パスの実体は zenshin-hp の src/consts/routes.ts と対応する
+  // https://github.com/ZENSHIN-Inc/zenshin-hp/blob/main/src/consts/routes.ts
   corporate: "https://www.zenshin-inc.co.jp/",
+  corporateServices: "https://www.zenshin-inc.co.jp/services/",
+  corporateAiConsultation:
+    "https://www.zenshin-inc.co.jp/services/ai-consultation/",
+  corporateBusinessTransformationConsulting:
+    "https://www.zenshin-inc.co.jp/services/business-transformation-consulting/",
+  corporateWorks: "https://www.zenshin-inc.co.jp/works/",
+  corporateCompany: "https://www.zenshin-inc.co.jp/company/",
+  corporateNews: "https://www.zenshin-inc.co.jp/news/",
+  corporateRecruit: "https://www.zenshin-inc.co.jp/recruit/",
   corporateContact: "https://www.zenshin-inc.co.jp/contact/?type=tech-blog",
   corporatePrivacy: "https://www.zenshin-inc.co.jp/privacy/",
   operatorX: "https://x.com/suguru_takaha4",

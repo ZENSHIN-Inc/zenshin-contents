@@ -1,62 +1,178 @@
 ---
 /**
  * サイトヘッダー（ZENSHIN 技術ブログ）
+ * ロゴ左、ナビ右寄せ。スクロール時の背景・テキスト色をセマンティックトークンで切り替え。
  *
- * zenshin-hp と同じスクロール挙動: ヒーロー（ダーク帯）上は透過 + 白ロゴ、
- * スクロール後は白背景（blur + shadow）+ ダークロゴに切り替える。
- * ロックアップは「ZENSHIN ロゴ + 技術ブログ 金チップ」（ロゴは h-7 を維持し、チップは垂直センター揃え）。
- * ナビは持たずロックアップのみ（会社サイトへのリンクはフッターに集約、
- * 検索・絞り込みはトップページの一覧に統合されている）。
+ * 【同期ポリシー】コーポレートサイト zenshin-hp のヘッダーと同じ見た目を保つ:
+ * https://github.com/ZENSHIN-Inc/zenshin-hp/blob/main/src/components/Header.astro
+ * ナビ項目や見た目を変更するときは必ず上記ファイルと突き合わせること。
+ * 片方だけ修正した場合は、もう片方のリポジトリに同期 Issue を立てるか、その場で修正 PR を出す。
+ *
+ * zenshin-hp との意図的な差分:
+ * - リンク先: 「技術ブログ」だけが当サイト内（/）で、他はコーポレートサイトへの絶対 URL
+ * - 「技術ブログ」を常にアクティブ表示（金下線）して現在地を示す
+ * - ドメインをまたいでも同一サイトに見えるよう、外部リンクアイコンは付けない
  */
 import { ROUTES } from "@/consts/routes";
+
+const navItems = [
+  { label: "ホーム", href: ROUTES.corporate },
+  {
+    label: "AI相談サービス",
+    href: ROUTES.corporateAiConsultation,
+    badge: "人気",
+  },
+  {
+    // ナビ幅の制約上「コンサルティング」は「コンサル」に略記（zenshin-hp と同じ）
+    label: "業務変革コンサル",
+    href: ROUTES.corporateBusinessTransformationConsulting,
+    badge: "伴走型",
+  },
+  { label: "事業内容", href: ROUTES.corporateServices },
+  { label: "事例紹介", href: ROUTES.corporateWorks },
+  { label: "会社情報", href: ROUTES.corporateCompany },
+  { label: "ニュース", href: ROUTES.corporateNews },
+  { label: "技術ブログ", href: ROUTES.home },
+  { label: "採用情報", href: ROUTES.corporateRecruit },
+  { label: "お問い合わせ", href: ROUTES.corporateContact },
+];
+
+// 当サイトは全ページが技術ブログ配下なので「技術ブログ」（唯一の内部リンク）を常にアクティブ扱い
+const isActiveNavItem = (item: (typeof navItems)[number]) =>
+  item.href === ROUTES.home;
 ---
 
 <header id="site-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
-  <div class="mx-auto max-w-6xl px-6 lg:px-8">
+  {/* 本文(max-w-6xl)より広くてよい。ナビ10項目が収まるようワイド画面では 1536px まで使う */}
+  <div class="mx-auto max-w-[1536px] px-6 lg:px-8">
     <div class="flex h-20 items-center justify-between">
-      <!-- ロックアップ: ロゴ（白/黒をスクロールで切り替え） + 技術ブログ 金チップ（垂直センター揃え） -->
-      <a href={ROUTES.home} class="relative z-50 flex items-end gap-2.5 active:opacity-70 active:scale-95">
-        <span class="relative inline-block">
-          <img
-            id="header-logo"
-            src="/assets/brand/ZENSHIN-logo-white.webp"
-            alt="ZENSHIN"
-            width="140"
-            height="32"
-            class="h-7 w-auto transition-all duration-300"
-            loading="eager"
-            fetchpriority="high"
-          />
-          <img
-            id="header-logo-dark"
-            src="/assets/brand/ZENSHIN-logo.webp"
-            alt="ZENSHIN"
-            width="140"
-            height="32"
-            class="absolute top-0 left-0 h-7 w-auto opacity-0 transition-all duration-300"
-            loading="eager"
-          />
-        </span>
-        {/* ZENSHIN サブブランドバッジ（完全な四角・白抜き）
-            高さと縦位置はロゴタイプの文字（N）に一致させ「文字列が連続している」見た目にする:
-            ロゴ画像 57px 中、文字は y=9〜53（高さ45・下端は画像下端の 3px 上）
-            → h-7(28px) 表示では 高さ 22px・下端オフセット 1.5px。
-            グラデはロゴのブランドゴールド #c4a97d から始めて「ロゴと地続き」に見せつつ、
-            白文字の視認性のため後半を濃い金に落とす */}
-        <span
-          class="mb-[1.5px] inline-flex h-[22px] items-center rounded-none bg-[linear-gradient(135deg,#c4a97d,#7a5f37_45%,#4a3a20)] px-[10px] text-[12px] font-bold leading-none tracking-[0.02em] text-white"
-        >
-          技術ブログ
-        </span>
+      <!-- ロゴ -->
+      <a href={ROUTES.home} class="relative z-50 active:opacity-70 active:scale-95">
+        <img
+          id="header-logo"
+          src="/assets/brand/ZENSHIN-logo-white.webp"
+          alt="ZENSHIN"
+          width="140"
+          height="32"
+          class="h-7 w-auto transition-all duration-300"
+          loading="eager"
+          fetchpriority="high"
+        />
+        <img
+          id="header-logo-dark"
+          src="/assets/brand/ZENSHIN-logo.webp"
+          alt="ZENSHIN"
+          width="140"
+          height="32"
+          class="absolute top-0 left-0 h-7 w-auto opacity-0 transition-all duration-300"
+          loading="eager"
+        />
       </a>
+
+      <!-- デスクトップナビ: 余白を項目間に均等分配（広い画面ほど間隔が広がる） -->
+      <div class="hidden flex-1 items-center xl:flex">
+        <nav class="flex w-full items-center justify-between pl-12">
+          {navItems.map((item) => {
+            const isActive = isActiveNavItem(item);
+            return (
+              <a
+                href={item.href}
+                class:list={[
+                  // ホバーでZENSHINゴールドの下線がバッジ含むリンク全幅に中央から両端へ伸びる
+                  "nav-link relative inline-flex items-center whitespace-nowrap text-base font-medium text-on-surface-dark/90 transition-all duration-200 after:absolute after:-bottom-1.5 after:left-0 after:h-0.5 after:w-full after:rounded-full after:bg-(--nav-underline) after:transition-transform after:duration-300 hover:text-white hover:after:scale-x-100 active:opacity-70 active:scale-95",
+                  // 現在地（aria-current）には下線を常時表示
+                  isActive ? "after:scale-x-100" : "after:scale-x-0",
+                  item.badge ? "gap-1.5" : "",
+                ]}
+                {...(isActive ? { "aria-current": "page" } : {})}
+              >
+                <span>{item.label}</span>
+                {item.badge && (
+                  <span class="rounded-full bg-accent px-2 py-1 font-display text-[10px] font-bold leading-tight whitespace-nowrap text-white">
+                    {item.badge}
+                  </span>
+                )}
+              </a>
+            );
+          })}
+        </nav>
+      </div>
+
+      <!-- モバイル: メニューボタン -->
+      <div class="flex items-center gap-2 xl:hidden">
+        <button
+          id="menu-toggle"
+          class="relative z-50 flex h-12 w-12 items-center justify-center active:opacity-70 active:scale-90"
+          aria-label="メニュー"
+          aria-expanded="false"
+        >
+          {/* ハンバーガーアイコン（3本線） */}
+          <svg id="menu-icon-open" class="h-6 w-6 text-white transition-all duration-150" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          {/* 閉じるアイコン（×） */}
+          <svg id="menu-icon-close" class="h-6 w-6 text-white opacity-0 absolute transition-all duration-150" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
+
 </header>
+
+<style>
+  /* ホバー下線の濃さをヘッダー背景の明暗で切り替え:
+     ヒーロー上（暗背景）は明るいゴールド、スクロール後（明背景）は濃いゴールド */
+  #site-header {
+    --nav-underline: var(--color-label-bright);
+  }
+  #site-header.scrolled {
+    --nav-underline: var(--color-label);
+  }
+  /* 下線は常に1本だけ: 他のナビ項目をホバーしている間は現在地（aria-current）の
+     常時下線を引っ込める（現在地 + ホバーの2本が同時に見える状態を避ける） */
+  #site-header nav:hover .nav-link[aria-current="page"]:not(:hover)::after {
+    transform: scaleX(0);
+  }
+</style>
+
+<!-- モバイルメニュー（header の外に配置し、fixed 位置を確実にする） -->
+<div id="mobile-menu" class="pointer-events-none fixed inset-0 z-40 bg-surface-dark opacity-0 transition-opacity duration-300">
+  <div class="flex h-full flex-col items-center justify-center gap-8">
+    {navItems.map((item, i) => {
+      const isActive = isActiveNavItem(item);
+      return (
+        <a
+          href={item.href}
+          class="mobile-link flex w-72 max-w-[calc(100vw-3rem)] translate-y-4 items-center justify-center text-center text-xl font-medium text-on-surface-dark opacity-0 transition-all duration-500 hover:text-accent active:opacity-70 active:scale-95"
+          style={`transition-delay: ${120 + i * 50}ms`}
+          {...(isActive ? { "aria-current": "page" } : {})}
+        >
+          <span class="relative inline-block">
+            {item.label}
+            {/* バッジはテキスト外側へ浮かせ、ラベル自体をセンタリング */}
+            {item.badge && (
+              <span class="absolute left-full top-1/2 ml-2 inline-flex min-w-10 -translate-y-1/2 items-center justify-center whitespace-nowrap rounded-full bg-accent px-2 py-1 font-display text-xs font-bold leading-tight text-white">
+                {item.badge}
+              </span>
+            )}
+          </span>
+        </a>
+      );
+    })}
+  </div>
+</div>
 
 <script>
   const header = document.getElementById("site-header");
+  const toggle = document.getElementById("menu-toggle");
+  const menu = document.getElementById("mobile-menu");
+  const iconOpen = document.getElementById("menu-icon-open");
+  const iconClose = document.getElementById("menu-icon-close");
+  let open = false;
 
-  // スクロール時: 背景・ロゴを切り替え（zenshin-hp と同じ挙動）
+  // スクロール時: 背景・テキスト色・ロゴを切り替え
   function onScroll() {
     if (!header) return;
     const scrolled = window.scrollY > 60;
@@ -74,7 +190,63 @@ import { ROUTES } from "@/consts/routes";
       logoWhite.classList.toggle("opacity-0", scrolled);
       logoDark.classList.toggle("opacity-0", !scrolled);
     }
+
+    // ナビテキストの色切り替え
+    header.querySelectorAll(".nav-link").forEach((a) => {
+      if (!scrolled) {
+        a.className = a.className.replace(/text-on-surface\/70|hover:text-on-surface/g, "").trim();
+        a.classList.add("text-on-surface-dark/90");
+        a.classList.add("hover:text-white");
+      } else {
+        a.className = a.className.replace(/text-on-surface-dark\/90|hover:text-white/g, "").trim();
+        a.classList.add("text-on-surface");
+        a.classList.add("hover:text-on-surface");
+      }
+    });
+
+    // ハンバーガーの色切り替え
+    if (iconOpen && !open) {
+      iconOpen.classList.toggle("text-white", !scrolled);
+      iconOpen.classList.toggle("text-on-surface", scrolled);
+    }
   }
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
+
+  // メニュー開閉
+  toggle?.addEventListener("click", () => {
+    open = !open;
+    toggle.setAttribute("aria-expanded", String(open));
+    if (open) {
+      menu?.classList.remove("pointer-events-none", "opacity-0");
+      menu?.classList.add("pointer-events-auto", "opacity-100");
+      iconOpen?.classList.add("opacity-0");
+      iconClose?.classList.remove("opacity-0");
+      menu?.querySelectorAll(".mobile-link").forEach((l) => l.classList.remove("opacity-0", "translate-y-4"));
+      document.body.style.overflow = "hidden";
+      // メニュー展開時はメインコンテンツを不活性化（a11y）
+      document.querySelector("main")?.setAttribute("inert", "");
+      // ヘッダー背景を透明にし、ロゴを白に統一（メニュー背景がダークのため）
+      header?.classList.remove("bg-surface/95", "shadow-sm", "backdrop-blur-md");
+      const logoWhite = document.getElementById("header-logo");
+      const logoDark = document.getElementById("header-logo-dark");
+      if (logoWhite && logoDark) {
+        logoWhite.classList.remove("opacity-0");
+        logoDark.classList.add("opacity-0");
+      }
+    } else {
+      menu?.classList.add("pointer-events-none", "opacity-0");
+      menu?.classList.remove("pointer-events-auto", "opacity-100");
+      iconOpen?.classList.remove("opacity-0");
+      iconClose?.classList.add("opacity-0");
+      menu?.querySelectorAll(".mobile-link").forEach((l) => l.classList.add("opacity-0", "translate-y-4"));
+      document.body.style.overflow = "";
+      document.querySelector("main")?.removeAttribute("inert");
+      onScroll();
+    }
+  });
+
+  menu?.querySelectorAll("a").forEach((a) =>
+    a.addEventListener("click", () => { if (open) toggle?.click(); })
+  );
 </script>

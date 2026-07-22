@@ -36,6 +36,8 @@
   --color-success: light-dark(#059669, #34d399);
   --color-warning: #fbbf24;
   --color-label: light-dark(#6b5a1e, #c4a97d);
+  /* ダーク背景（ヒーロー）上のナビホバー下線用の明るいゴールド（zenshin-hp と同値） */
+  --color-label-bright: #c8c0a0;
 
   /* === フォント ===
      OS 標準フォント（Mac はヒラギノ、Win は Yu Gothic UI、Android は Noto）。

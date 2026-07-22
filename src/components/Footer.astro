@@ -1,26 +1,59 @@
 ---
 /**
- * フッター（ZENSHIN 技術ブログ）— ダーク背景、ロゴ + サイトマップ + コピーライト
- * （zenshin-hp のフッターと同じ構成: ロゴ + 説明 + 住所 / カテゴリ別リンク / コピーライト）
+ * フッター（ZENSHIN 技術ブログ）— ダーク背景、ロゴ + カテゴリ別サイトマップ + コピーライト
+ *
+ * 【同期ポリシー】コーポレートサイト zenshin-hp のフッターと同じ見た目を保つ:
+ * https://github.com/ZENSHIN-Inc/zenshin-hp/blob/main/src/components/Footer.astro
+ * リンク構成や見た目を変更するときは必ず上記ファイルと突き合わせること。
+ * 片方だけ修正した場合は、もう片方のリポジトリに同期 Issue を立てるか、その場で修正 PR を出す。
+ *
+ * zenshin-hp との意図的な差分:
+ * - リンク先: 「技術ブログ」だけが当サイト内（/）で、他はコーポレートサイトへの絶対 URL
+ * - 当サイトにのみ「購読する」列（RSS・運用者 X）を追加（4列目）
  */
 import { Icon } from "astro-icon/components";
 import { ROUTES } from "@/consts/routes";
 
-// トップの種別チップと重複するため「ブログ / スライド」の個別リンクは置かない。
-// 「運営会社への導線」と「購読導線」で目的別に分ける
-const linkGroups = [
+type FooterLink = {
+  label: string;
+  href: string;
+  /** 第三者ドメインへのリンク（アイコンで示し、新規タブで開く） */
+  external?: boolean;
+};
+
+const linkGroups: { heading: string; links: FooterLink[] }[] = [
   {
-    heading: "運営会社",
+    heading: "サービス",
     links: [
-      { label: "ホームページ", href: ROUTES.corporate, external: false },
-      { label: "お問い合わせ", href: ROUTES.corporateContact, external: false },
-      { label: "プライバシーポリシー", href: ROUTES.corporatePrivacy, external: false },
+      { label: "AI相談サービス", href: ROUTES.corporateAiConsultation },
+      {
+        label: "業務変革コンサルティング",
+        href: ROUTES.corporateBusinessTransformationConsulting,
+      },
+      { label: "事業内容", href: ROUTES.corporateServices },
+      { label: "事例紹介", href: ROUTES.corporateWorks },
+    ],
+  },
+  {
+    heading: "企業情報",
+    links: [
+      { label: "会社情報", href: ROUTES.corporateCompany },
+      { label: "ニュース", href: ROUTES.corporateNews },
+      { label: "技術ブログ", href: ROUTES.home },
+      { label: "採用情報", href: ROUTES.corporateRecruit },
+    ],
+  },
+  {
+    heading: "お問い合わせ",
+    links: [
+      { label: "お問い合わせ", href: ROUTES.corporateContact },
+      { label: "プライバシーポリシー", href: ROUTES.corporatePrivacy },
     ],
   },
   {
     heading: "購読する",
     links: [
-      { label: "RSS", href: ROUTES.rss, external: false },
+      { label: "RSS", href: ROUTES.rss },
       { label: "運用者 高橋 俊のX", href: ROUTES.operatorX, external: true },
     ],
   },
@@ -29,17 +62,15 @@ const linkGroups = [
 
 <footer class="bg-surface-dark">
   <div class="mx-auto max-w-6xl px-6 py-12 lg:px-8">
-    <div class="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-[1.5fr_1fr_1fr] md:gap-8">
+    {/* モバイル: リンク2列が先、ロゴ+住所は最後（参照情報なので下）。lg以上: ロゴ左の5カラム */}
+    <div class="grid grid-cols-2 gap-x-6 gap-y-8 lg:grid-cols-[1.5fr_1fr_1fr_1fr_1fr] lg:gap-8">
       <!-- ロゴ + 説明 -->
-      <div class="order-last col-span-2 max-w-xs md:order-none md:col-span-1">
-        <a href={ROUTES.home} class="inline-flex items-end gap-2 active:opacity-70 active:scale-95">
-          <img src="/assets/brand/ZENSHIN-logo-white.webp" alt="ZENSHIN 技術ブログ - ホームに戻る" width="120" height="28" class="h-6 w-auto" loading="lazy" />
-          {/* 高さと縦位置はロゴの文字（N）に一致させる（h-6=24px 表示 → 文字高 19px・下端オフセット 1px） */}
-          <span class="mb-px inline-flex h-[19px] items-center rounded-none bg-[linear-gradient(135deg,#c4a97d,#7a5f37_45%,#4a3a20)] px-2 text-[10px] font-bold leading-none tracking-[0.02em] text-white">技術ブログ</span>
+      <div class="order-last col-span-2 max-w-xs lg:order-none lg:col-span-1">
+        <a href={ROUTES.home} class="inline-block active:opacity-70 active:scale-95">
+          <img src="/assets/brand/ZENSHIN-logo-white.webp" alt="ZENSHIN - ホームに戻る" width="120" height="28" class="h-6 w-auto" loading="lazy" />
         </a>
-        {/* 説明文 — 文節単位の inline-block で「スライド資料」等の語中改行を防ぐ */}
-        <p class="mt-4 text-sm leading-relaxed text-white/80">
-          株式会社ZENSHINの技術ブログ<br /><span class="inline-block">AI活用や</span><span class="inline-block">プロダクト開発の</span><span class="inline-block">技術知見を</span><span class="inline-block">記事や</span><span class="inline-block">スライド資料で</span><span class="inline-block">発信しています</span>
+        <p class="mt-4 whitespace-nowrap text-sm leading-relaxed text-white/80">
+          大手の品質を、AIの速度で。
         </p>
         <address class="mt-3 text-xs not-italic leading-relaxed text-white/60">
           〒150-0041<br />
